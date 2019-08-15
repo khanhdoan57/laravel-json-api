@@ -3,6 +3,7 @@
 namespace HackerBoy\LaravelJsonApi\Helpers;
 
 use HackerBoy\LaravelJsonApi\Exceptions\JsonApiException;
+use Illuminate\Database\Eloquent\Model;
 
 class Authorization {
 
@@ -33,9 +34,15 @@ class Authorization {
 
 			$className = is_object($model) ? get_class($model) : $model;
 
+			if (is_object($model) and $model instanceof Model) {
+				$errorTitle = 'You dont have permission to '.$scope.' resource ['.JsonApi::getResourceTypeByModelClass($className).':'.$model->{$model->getKeyName()}.']';
+			} else {
+				$errorTitle = 'You dont have permission to '.$scope.' "'.JsonApi::getResourceTypeByModelClass($className).'" resources';
+			}
+
 			throw new JsonApiException([
 				'errors' => [
-					'title' => 'You dont have permission to '.$scope.' "'.JsonApi::getResourceTypeByModelClass($className).'" resources'
+					'title' => $errorTitle
 				],
 				'statusCode' => 403
 			]);

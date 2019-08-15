@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 use HackerBoy\LaravelJsonApi\Helpers as Helper;
+use HackerBoy\LaravelJsonApi\Helpers\Authorization;
 
 trait Store {
 
@@ -487,7 +488,7 @@ trait Store {
 			}
 
 			// Check related resource exists
-			if (!$relatedClass::find($relationship['id'])) {
+			if (!$relatedModelObject = $relatedClass::find($relationship['id'])) {
 
 				throw new JsonApiException([
 					'errors' => [
@@ -498,6 +499,9 @@ trait Store {
 
 			}
 
+			// Check permission
+			Authorization::check('update', $relatedModelObject);
+			Authorization::check('update', $modelObject);
 			
 			$_insertData = [
 				$relationshipObject->getForeignPivotKeyName() => $modelObject->{$modelObject->getKeyName()},
@@ -851,6 +855,9 @@ trait Store {
 	*/
 	protected function saveWithoutEvents($modelObject)
 	{
+		// Check permission
+		Authorization::check('update', $modelObject);
+
 		$dispatcher = $modelObject->getEventDispatcher();
 		$modelObject->unsetEventDispatcher();
 		$modelObject->save();

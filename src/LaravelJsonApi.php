@@ -38,7 +38,6 @@ class LaravelJsonApi {
 	*
 	*		'post.saving' => function($modelObject) {},
 	*		'post.saved' => function($modelObject) {},
-	*		'post.relationships' => function($modelObject, $data) {},
 	*
 	*		'patch.query' => function($modelClass, $query) {},
 	*		'patch.saving' => function($) {},
@@ -65,18 +64,18 @@ class LaravelJsonApi {
 	*				'getRelationshipData', 
 	*			],
 	*			
-				// Fillable - default will load from model fillable variable
-				'fillable' => [...],		
-
-				// Validation
-				'validation' => [
-					'post' => [
-						'field' => 'required|min:6',
-						...
-					],
-					'patch' => []
-				],
-				
+	*			// Fillable - default will load from model fillable variable
+	*			'fillable' => [...],		
+	*
+	*			// Validation
+	*			'validation' => [
+	*				'post' => [
+	*					'field' => 'required|min:6',
+	*					...
+	*				],
+	*				'patch' => []
+	*			],
+	*			
 	*			// Override global middleware config
 	*			'middlewares' => [
 	*				'get' => ['...'],
