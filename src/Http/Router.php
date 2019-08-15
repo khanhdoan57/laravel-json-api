@@ -63,6 +63,9 @@ class Router {
 			
 				foreach ($routes as $method) {
 
+					// Get middlewares
+					$middlewares = $this->getRouteMiddlewares($modelClass, $method);
+
 					// Get relationship
 					if ($method === 'getRelationships') {
 
@@ -72,7 +75,7 @@ class Router {
 							$controller = new Controller($this->document, $modelClass, $this->config);
 							return $controller->relationships($id, $relationshipName);
 
-						});
+						})->middleware($middlewares);
 
 						continue;
 					}
@@ -86,7 +89,7 @@ class Router {
 							$controller = new Controller($this->document, $modelClass, $this->config);
 							return $controller->relationships($id, $relationshipName, 'resource');
 
-						});
+						})->middleware($middlewares);;
 
 						continue;
 					}
@@ -102,7 +105,7 @@ class Router {
 							$controller = new Controller($this->document, $modelClass, $this->config);
 							return $controller->storeRelationships($id, $relationshipName);
 
-						});
+						})->middleware($middlewares);;
 
 					}
 
@@ -118,7 +121,7 @@ class Router {
 								return $controller->{$method}($id);
 
 							}
-					);
+					)->middleware($middlewares);
 
 				}
 
@@ -131,4 +134,19 @@ class Router {
 		}
 	}
 
+	/**
+	* Get route middlewares
+	*/
+	private function getRouteMiddlewares($modelClass, $routeName)
+	{
+		if (isset($this->config['resources'][$modelClass]['middlewares'][$routeName])) {
+			return $this->config['resources'][$modelClass]['middlewares'][$routeName];
+		}
+
+		if (isset($this->config['middlewares'])) {
+			return $this->config['middlewares'];
+		}
+
+		return [];
+	}
 }

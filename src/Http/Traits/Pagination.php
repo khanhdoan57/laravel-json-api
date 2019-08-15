@@ -52,7 +52,7 @@ trait Pagination {
 		$calculatePage = $limit > 0 ? ($count / $limit) : 0;
 		$calculatePage = $calculatePage > 1 ? $calculatePage : 1;
 		$calculatePageRounded = intval($calculatePage);
-		$calculatePage = ($calculatePage > $calculatePageRounded) ? $calculatePage+1 : $calculatePage;
+		$calculatePage = ($calculatePage > $calculatePageRounded) ? $calculatePageRounded+1 : $calculatePageRounded;
 		$lastLinkQuery = $httpQuery;
 		$lastLinkQuery['page'] = $calculatePage;
 		$lastLink = $baseLink.'?'.http_build_query($lastLinkQuery);

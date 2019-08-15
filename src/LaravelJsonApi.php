@@ -57,10 +57,12 @@ class LaravelJsonApi {
 	*			
 	*			// Define available routes or specify the handler - default will have all routes
 	*			'routes' => [
-	*				'get', 'collection', 'relationships', 'relationshipData',
+	*				'get', 'collection', 
 	*				'post' => function() { },
 	*				'patch',
-	*				'delete'
+	*				'delete',
+	*				'getRelationships', 'postRelationships', 'patchRelationships', 'deleteRelationships', 
+	*				'getRelationshipData', 
 	*			],
 	*			
 				// Fillable - default will load from model fillable variable
