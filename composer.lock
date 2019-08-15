@@ -1,0 +1,56 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "4efc0c1688d7634881b1d47f60ec4427",
+    "packages": [
+        {
+            "name": "hackerboy/json-api",
+            "version": "1.2.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hackerboydotcom/json-api.git",
+                "reference": "7bacb9d1dd572cbd8746c399950baf9b53af69f7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hackerboydotcom/json-api/zipball/7bacb9d1dd572cbd8746c399950baf9b53af69f7",
+                "reference": "7bacb9d1dd572cbd8746c399950baf9b53af69f7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "HackerBoy\\JsonApi\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "HackerBoy.com",
+                    "email": "admin@hackerboy.com"
+                }
+            ],
+            "description": "PHP JSON API implementation (server side)",
+            "time": "2019-08-12T09:04:39+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=7.1.0"
+    },
+    "platform-dev": []
+}

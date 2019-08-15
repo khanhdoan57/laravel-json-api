@@ -1,0 +1,23 @@
+{
+    "name": "hackerboy/laravel-json-api",
+    "description": "Auto JSON:API generator for Laravel framework",
+    "type": "library",
+    "require": {
+        "hackerboy/json-api": "^1.2",
+        "art4/json-api-client": "^0.10.0",
+        "php": ">=7.1.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "HackerBoy",
+            "email": "admin@hackerboy.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+          "HackerBoy\\LaravelJsonApi\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}
