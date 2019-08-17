@@ -16,7 +16,9 @@ use HackerBoy\LaravelJsonApi\Helpers\ModelHelper;
 
 class Controller extends BaseController {
 
-	use Traits\ExceptionHandler, Traits\Pagination, Traits\CollectionRelationshipResolver, Traits\Store;
+	use Traits\ExceptionHandler, Traits\Pagination, 
+	Traits\CollectionRelationshipResolver, Traits\Store, 
+	Traits\CustomQuery, Traits\DataFilter, Traits\Sortable;
 
 	protected $document;
 	protected $modelClass;
@@ -116,7 +118,9 @@ class Controller extends BaseController {
 				call_user_func($this->config['events']['get.beforeReturn'], [$resource, $this->document]);
 			}
 
-			return response()->json($this->document, $successStatusCode);
+			$data = $this->document->toArray();
+
+			return response()->json($this->dataFilter($data), $successStatusCode);
 
 		} catch (JsonApiException $e) {
 			return $this->exceptionHandler($e);
@@ -328,15 +332,33 @@ class Controller extends BaseController {
 			} else {
 
 				// Make query
-				$query = new $this->modelClass;
+				$query = $this->modelClass::query();
 
 				// Callback
 				if (isset($this->config['events']['collection.query']) and is_callable($this->config['events']['collection.query'])) {
 					call_user_func($this->config['events']['collection.query'], [$this->modelClass, $query]);
 				}
 
-				// Get data
-				$collection = $query->take($limit)->skip($skip)->get();
+				// Filter
+				if ($filter = $this->request->query('filter') and is_array($filter)) {
+
+					$queryData = [
+					];
+
+					foreach ($filter as $key => $value) {
+						$queryData[] = [
+							'field' => $key,
+							'value' => $value
+						];
+					}
+
+					$this->queryComposer($queryData, $query);
+
+				} elseif ($queryData = $this->request->query('_query') and $queryData = json_decode(urldecode($queryData), true) and is_array($queryData)) {
+					$this->queryComposer($queryData, $query);
+				}
+
+				$collection = $this->sortQuery(clone $query)->take($limit)->skip($skip)->get();
 
 				// Data pagination
 				$this->responsePagination($query);
@@ -399,7 +421,9 @@ class Controller extends BaseController {
 				call_user_func($this->config['events']['collection.beforeReturn'], [$collection, $this->document]);
 			}
 
-			return response()->json($this->document);
+			$data = $this->document->toArray();
+
+			return response()->json($this->dataFilter($data));
 
 		} catch (JsonApiException $e) {
 			return $this->exceptionHandler($e);

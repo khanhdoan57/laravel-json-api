@@ -64,8 +64,29 @@ class LaravelJsonApi {
 	*				'getRelationshipData', 
 	*			],
 	*			
-	*			// Fillable - default will load from model fillable variable
-	*			'fillable' => [...],		
+	*			// Fillable - fields that can be written - default will load from model fillable variable
+	*			'fillable' => [...],
+	*			
+	*			// Sortable fields
+	*			'sortable' => [
+	*				'created_at', 'updated_at',
+	*				'custom_field' => function($query) {
+	*					// Custom handler
+	*				}
+	*			],
+	*
+	*			// Maximum number of fields for multiple field sorting
+	*			'max_multiple_sorting' => 2, // Default 2
+	*
+	*			// Filter - fields that can be query
+	*			'filter' => ['field1', 'field2', 'field3', 
+	*				'field4' => function($queryData, $queryObject) {
+	*								// Custom filter
+	*								$query->where('field4', $queryData['value']);
+	*							}
+	*			],
+	*			
+	*			'max_query_conditions' => 5, // Max number of query condition - default 5
 	*
 	*			// Validation
 	*			'validation' => [
