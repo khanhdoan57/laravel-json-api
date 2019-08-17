@@ -100,8 +100,9 @@ trait CustomQuery {
 		$this->conditionCount++;
 
 		// Check if has custom handler
-		if (isset($filter[$queryData['field']]) and is_callable($filter[$queryData['field']])) {
-			call_user_func($filter[$queryData['field']], [$queryData, $query]);
+		$customHandler = isset($this->config['resources'][$this->modelClass]['filter'][$queryData['field']]) ? $this->config['resources'][$this->modelClass]['filter'][$queryData['field']] : null;
+		if (is_callable($customHandler)) {
+			call_user_func_array($customHandler, [$queryData, $query]);
 			return;
 		}
 

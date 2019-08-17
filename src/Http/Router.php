@@ -72,7 +72,7 @@ class Router {
 						Route::get('{id}/relationships/{relationshipName}', isset($actions[$method]) ? $actions[$method] : function($id, $relationshipName) use ($modelClass) {
 
 							// Auto controller
-							$controller = new Controller($this->document, $modelClass, $this->config);
+							$controller = app()->make('laravel-json-api')->getController($modelClass);
 							return $controller->relationships($id, $relationshipName);
 
 						})->middleware($middlewares);
@@ -86,7 +86,7 @@ class Router {
 						Route::get('{id}/{relationshipName}', isset($actions[$method]) ? $actions[$method] : function($id, $relationshipName) use ($modelClass) {
 
 							// Auto controller
-							$controller = new Controller($this->document, $modelClass, $this->config);
+							$controller = app()->make('laravel-json-api')->getController($modelClass);
 							return $controller->relationships($id, $relationshipName, 'resource');
 
 						})->middleware($middlewares);;
@@ -102,7 +102,7 @@ class Router {
 						Route::{$method}('{id}/relationships/{relationshipName}', isset($actions[$method]) ? $actions[$method] : function($id, $relationshipName) use ($modelClass) {
 
 							// Auto controller
-							$controller = new Controller($this->document, $modelClass, $this->config);
+							$controller = app()->make('laravel-json-api')->getController($modelClass);
 							return $controller->storeRelationships($id, $relationshipName);
 
 						})->middleware($middlewares);;
@@ -116,7 +116,7 @@ class Router {
 							function($id = null) use ($method, $modelClass) {
 
 								// Auto controller
-								$controller = new Controller($this->document, $modelClass, $this->config);
+								$controller = app()->make('laravel-json-api')->getController($modelClass);
 
 								return $controller->{$method}($id);
 

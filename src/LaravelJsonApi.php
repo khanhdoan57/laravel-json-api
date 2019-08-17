@@ -12,6 +12,8 @@ class LaravelJsonApi {
 
 	protected $router;
 
+	protected $controllers = [];
+
 	/**
 	* @param object Document object
 	* @param config array
@@ -139,6 +141,7 @@ class LaravelJsonApi {
 		// Set url
 		$this->document->setUrl($this->config['prefix']);
 
+		// Init controller
 		$this->router = new Http\Router($this->document, $this->config);
 	}
 
@@ -148,5 +151,13 @@ class LaravelJsonApi {
 	public function getRouter()
 	{
 		return $this->router;
+	}
+
+	/**
+	* Get controller object
+	*/
+	public function getController($modelClass)
+	{
+		return isset($this->controllers[$modelClass]) ? $this->controllers[$modelClass] : ($this->controllers[$modelClass] = new Http\Controller($this->document, $modelClass, $this->config));
 	}
 }

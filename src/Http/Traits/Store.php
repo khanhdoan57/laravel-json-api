@@ -168,7 +168,7 @@ trait Store {
 
 				// Custom handler
 				if (is_callable($this->config['resources'][$modelClass]['relationships'][$relationshipName]['write'])) {
-					call_user_func($this->config['resources'][$modelClass]['relationships'][$relationshipName]['write'], [$resourceModel, $relationshipData]);
+					call_user_func_array($this->config['resources'][$modelClass]['relationships'][$relationshipName]['write'], [$resourceModel, $relationshipData]);
 					continue;
 				}
 				
@@ -402,7 +402,7 @@ trait Store {
 
 		// Callback
 		if (isset($this->config['events']['relationships.saving']) and is_callable($this->config['events']['relationships.saving'])) {
-			call_user_func($this->config['events']['relationships.saving'], [$modelObject, $relationshipName, $relationshipData]);
+			call_user_func_array($this->config['events']['relationships.saving'], [$modelObject, $relationshipName, $relationshipData]);
 		}
 
 		// Save without observer events
@@ -410,7 +410,7 @@ trait Store {
 
 		// Callback
 		if (isset($this->config['events']['relationships.saved']) and is_callable($this->config['events']['relationships.saved'])) {
-			call_user_func($this->config['events']['relationships.saved'], [$modelObject, $relationshipName, $relationshipData]);
+			call_user_func_array($this->config['events']['relationships.saved'], [$modelObject, $relationshipName, $relationshipData]);
 		}
 
 	}
@@ -556,7 +556,7 @@ trait Store {
 
 			// Callback
 			if (isset($this->config['events']['relationships.saving']) and is_callable($this->config['events']['relationships.saving'])) {
-				call_user_func($this->config['events']['relationships.saving'], [$modelObject, $relationshipName, $relationshipData]);
+				call_user_func_array($this->config['events']['relationships.saving'], [$modelObject, $relationshipName, $relationshipData]);
 			}
 
 			// Create relationship
@@ -564,7 +564,7 @@ trait Store {
 
 			// Callback
 			if (isset($this->config['events']['relationships.saved']) and is_callable($this->config['events']['relationships.saved'])) {
-				call_user_func($this->config['events']['relationships.saved'], [$modelObject, $relationshipName, $relationshipData]);
+				call_user_func_array($this->config['events']['relationships.saved'], [$modelObject, $relationshipName, $relationshipData]);
 			}
 
 		}
@@ -655,14 +655,14 @@ trait Store {
 
 			// Callback
 			if (isset($this->config['events']['relationships.saving']) and is_callable($this->config['events']['relationships.saving'])) {
-				call_user_func($this->config['events']['relationships.saving'], [$modelObject, $relationshipName, $relationshipData]);
+				call_user_func_array($this->config['events']['relationships.saving'], [$modelObject, $relationshipName, $relationshipData]);
 			}
 
 			$this->saveWithoutEvents($relatedModelObject);
 
 			// Callback
 			if (isset($this->config['events']['relationships.saved']) and is_callable($this->config['events']['relationships.saved'])) {
-				call_user_func($this->config['events']['relationships.saved'], [$modelObject, $relationshipName, $relationshipData]);
+				call_user_func_array($this->config['events']['relationships.saved'], [$modelObject, $relationshipName, $relationshipData]);
 			}
 
 		};
@@ -738,14 +738,14 @@ trait Store {
 
 			// Callback
 			if (isset($this->config['events']['relationships.saving']) and is_callable($this->config['events']['relationships.saving'])) {
-				call_user_func($this->config['events']['relationships.saving'], [$modelObject, $relationshipName, $relationshipData]);
+				call_user_func_array($this->config['events']['relationships.saving'], [$modelObject, $relationshipName, $relationshipData]);
 			}
 
 			$this->saveWithoutEvents($find);
 
 			// Callback
 			if (isset($this->config['events']['relationships.saved']) and is_callable($this->config['events']['relationships.saved'])) {
-				call_user_func($this->config['events']['relationships.saved'], [$modelObject, $relationshipName, $relationshipData]);
+				call_user_func_array($this->config['events']['relationships.saved'], [$modelObject, $relationshipName, $relationshipData]);
 			}
 
 		};
@@ -817,7 +817,7 @@ trait Store {
 
 		// Callback
 		if (isset($this->config['events']['relationships.saving']) and is_callable($this->config['events']['relationships.saving'])) {
-			call_user_func($this->config['events']['relationships.saving'], [$modelObject, $relationshipName, $relationshipData]);
+			call_user_func_array($this->config['events']['relationships.saving'], [$modelObject, $relationshipName, $relationshipData]);
 		}
 
 		// Update
@@ -826,7 +826,7 @@ trait Store {
 
 		// Callback
 		if (isset($this->config['events']['relationships.saved']) and is_callable($this->config['events']['relationships.saved'])) {
-			call_user_func($this->config['events']['relationships.saved'], [$modelObject, $relationshipName, $relationshipData]);
+			call_user_func_array($this->config['events']['relationships.saved'], [$modelObject, $relationshipName, $relationshipData]);
 		}
 	}
 
