@@ -610,7 +610,7 @@ Syntax:
 
 Example:
 
-`GET /api/users?includes[users]=name,email&excludes[posts]=content,description&excludes[]`
+`GET /api/users?includes[users]=name,email&excludes[posts]=content,description`
 
 *Return only "email", "name" attributes for `users` resources and excludes "content", "description" attributes from `posts` resources*
 
