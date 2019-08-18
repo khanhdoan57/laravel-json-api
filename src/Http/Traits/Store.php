@@ -330,6 +330,13 @@ trait Store {
 					continue;
 				}
 
+				throw new JsonApiException([
+					'errors' => [
+						'title' => 'No handler found for relationship '.$relationshipName
+					],
+					'statusCode' => 500
+				]);
+
 			}
 
 		}

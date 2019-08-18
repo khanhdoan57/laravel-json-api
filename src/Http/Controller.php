@@ -379,6 +379,9 @@ class Controller extends BaseController {
 
 			}
 
+			// Remove unauthorized resources
+			ModelHelper::removeUnauthorizedResources($collection);
+
 			// Set document data
 			$this->document->setData($collection);
 

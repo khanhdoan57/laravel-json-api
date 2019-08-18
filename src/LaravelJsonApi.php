@@ -25,6 +25,7 @@ class LaravelJsonApi {
 	*	'maximum_result_limit' => 'api',
 	*	'prefix' => 'api',
 	*	'use_policies' => true, // Check policy
+	*	'deep_policy_check' => false, // Check policy "view" permission on every single resource in collection
 	*	'user_resolver' => function() {}, // Resolve user - default will use \Auth::user()
 	*	'allow_guest_users' => true, // Default false
 	*	'guest_user_resolver' => function() {}, // Default will be new App\User;
@@ -132,9 +133,6 @@ class LaravelJsonApi {
 		// Load config to jsonapi helper
 		Helpers\JsonApi::load($this->document, config($config['jsonapi_config']));
 
-		// Load config to authorization helper
-		Helpers\Authorization::setConfig($this->config);
-
 		// Remove last slash
 		$this->config['prefix'] = @rtrim($this->config['prefix'], '/');
 
@@ -143,6 +141,14 @@ class LaravelJsonApi {
 
 		// Init controller
 		$this->router = new Http\Router($this->document, $this->config);
+	}
+
+	/**
+	* Get config
+	*/
+	public function getConfig()
+	{
+		return $this->config;
 	}
 
 	/**

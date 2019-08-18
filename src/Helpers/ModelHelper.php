@@ -3,6 +3,7 @@
 namespace HackerBoy\LaravelJsonApi\Helpers;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class ModelHelper {
 
@@ -17,14 +18,14 @@ class ModelHelper {
         return array_unique(array_filter($attributes));
     }
 
-    public static function removeUnauthorizedResources(array &$data)
+    public static function removeUnauthorizedResources(&$collection)
     {
     	// Sort by class
     	$sortByClass = [];
 
     	$finalData = [];
 
-    	foreach ($data as $modelObject) {
+    	foreach ($collection as $modelObject) {
     		
     		$className = get_class($modelObject);
 
@@ -48,7 +49,34 @@ class ModelHelper {
 
     	}
 
-    	$data = $finalData;
+        // Deep policy check
+        if (!isset(app()->make('laravel-json-api')->getConfig()['deep_policy_check']) or app()->make('laravel-json-api')->getConfig()['deep_policy_check']) {
+
+            foreach ($finalData as $key => $resource) {
+                
+                if (!Authorization::check('view', $resource, false)) {
+                    self::removeResource($finalData, $key);
+                }
+
+            }
+
+        }
+
+    	if ($collection instanceof Collection) {
+            return $collection = collect($finalData);
+        }
+
+        return $collection = $finalData;
     }
 
+    protected static function removeResource(&$collection, $key)
+    {
+        if ($collection instanceof Collection) {
+            $collection->forget($key);
+        } else {
+            unset($collection[$key]);
+        }
+
+        return $collection;
+    }
 }

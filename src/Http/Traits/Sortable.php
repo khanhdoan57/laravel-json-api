@@ -83,7 +83,7 @@ trait Sortable {
 
 				// If having custom handler
 				if (isset($sortable[$sortField]) and is_callable($sortable[$sortField])) {
-					call_user_func($sortable[$sortField], $query);
+					call_user_func_array($sortable[$sortField], [$query, $desc ? 'desc' : 'asc']);
 					continue;
 				}
 

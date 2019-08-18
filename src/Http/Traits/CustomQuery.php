@@ -234,7 +234,7 @@ trait CustomQuery {
 		}
 
 		// Check operator valid
-		if (!in_array($queryData['operator'], ['=', '>', '<', '>=', '<='])) {
+		if (!in_array($queryData['operator'], ['=', '!=', '>', '<', '>=', '<='])) {
 
 			if ($return) {
 				return false;

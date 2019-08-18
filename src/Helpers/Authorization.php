@@ -12,6 +12,8 @@ class Authorization {
 
 	public static function check($scope, $model, $throwException = true)
 	{
+		self::setConfig();
+		
 		$pass = true;
 
 		if (!self::$usePolicies) {
@@ -52,8 +54,10 @@ class Authorization {
 		return $pass;
 	}
 
-	public static function setConfig($config)
+	public static function setConfig()
 	{
+		$config = app()->make('laravel-json-api')->getConfig();
+
 		self::$user = (isset($config['user_resolver']) and is_callable($config['user_resolver'])) ? $config['user_resolver'] : \Auth::user();
 		self::$usePolicies = isset($config['use_policies']) ? $config['use_policies'] : false;
 
