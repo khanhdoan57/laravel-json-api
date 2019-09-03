@@ -36,7 +36,7 @@ class Router {
 			$resourceType = $resource->getType($model);
 
 			// Route group
-			Route::prefix((isset($this->config['prefix']) ? $this->config['prefix'] : '/').'/'.$resourceType)->group(function() use ($modelClass) {
+			Route::prefix((isset($this->config['prefix']) ? $this->config['prefix'] : '/').'/'.$resourceType)->name($resourceType.'.')->group(function() use ($modelClass) {
 
 				$defaultRouteData = ['get', 'collection', 'post', 'patch', 'delete', 'getRelationships', 'postRelationships', 'patchRelationships', 'deleteRelationships', 'getRelationshipData'];
 				$routeData = isset($this->config['resources'][$modelClass]['routes']) ? $this->config['resources'][$modelClass]['routes'] : $defaultRouteData;
@@ -75,7 +75,7 @@ class Router {
 							$controller = app()->make('laravel-json-api')->getController($modelClass);
 							return $controller->relationships($id, $relationshipName);
 
-						})->middleware($middlewares);
+						})->name($method)->middleware($middlewares);
 
 						continue;
 					}
@@ -89,7 +89,7 @@ class Router {
 							$controller = app()->make('laravel-json-api')->getController($modelClass);
 							return $controller->relationships($id, $relationshipName, 'resource');
 
-						})->middleware($middlewares);;
+						})->name($method)->middleware($middlewares);;
 
 						continue;
 					}
@@ -105,7 +105,7 @@ class Router {
 							$controller = app()->make('laravel-json-api')->getController($modelClass);
 							return $controller->storeRelationships($id, $relationshipName);
 
-						})->middleware($middlewares);;
+						})->name($method)->middleware($middlewares);;
 
 					}
 
@@ -121,7 +121,7 @@ class Router {
 								return $controller->{$method}($id);
 
 							}
-					)->middleware($middlewares);
+					)->name($method)->middleware($middlewares);
 
 				}
 
