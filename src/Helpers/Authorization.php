@@ -58,7 +58,7 @@ class Authorization {
 	{
 		$config = app()->make('laravel-json-api')->getConfig();
 
-		self::$user = (isset($config['user_resolver']) and is_callable($config['user_resolver'])) ? $config['user_resolver'] : \Auth::user();
+		self::$user = (isset($config['user_resolver']) and is_callable($config['user_resolver'])) ? call_user_func($config['user_resolver']) : \Auth::user();
 		self::$usePolicies = isset($config['use_policies']) ? $config['use_policies'] : false;
 
 		if (@$config['allow_guest_users'] and !self::$user) {
