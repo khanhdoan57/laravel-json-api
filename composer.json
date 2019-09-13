@@ -19,5 +19,12 @@
           "HackerBoy\\LaravelJsonApi\\": "src/"
         }
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "HackerBoy\\LaravelJsonApi\\LaravelJsonApiProvider"
+            ]
+        }
+    },
     "minimum-stability": "stable"
 }

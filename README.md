@@ -38,17 +38,17 @@
     },
     ...
 
-    "repositories": {
-      "laravel-json-api": {
+    "repositories": [
+      {
         "type": "git",
         "url": "https://github.com/hackerboydotcom/laravel-json-api.git"
       }
-    }
+    ]
 }
 ```
 
 - This package is based on hackerboy/json-api package, so please config json-api package first. More detail at: https://packagist.org/packages/hackerboy/json-api
-- After sucessfully installed the package. Now let's create a new file at "/config/laravel_jsonapi.php" like below
+- After sucessfully set up the `hackerboy/json-api` package. Now let's create a new file at "/config/laravel_jsonapi.php" like below
 
 
 ```
@@ -63,7 +63,7 @@ return [
 ];
 ```
 
-- Now open your /config/app.php and register the package provider.
+- Now open your /config/app.php and register the package provider (you dont have to do this if you're using Laravel 5.5 or higher)
 
 ```
 <?php
@@ -461,6 +461,186 @@ return [
 ```
 
 # Events
+
+Events are registered under "events" member in your config
+
+```php
+<?php
+// /config/laravel_jsonapi.php
+
+return [
+    ...
+    'events' => [
+        '{EVENT-NAME}' => function(){...},
+        '{EVENT-NAME}' => ['Class', 'method'],
+        ...
+    ]
+];
+```
+
+Below is the list of all event names:
+
+## Get a resource events
+
+These events will be triggered in GET request for a single resource.
+
+### get.query
+
+This event will be triggered before the get query is executed.
+
+Param | type | Description
+------|------|------------
+$modelClass | string | Model class name
+$query | object | Laravel query object
+
+### get.beforeReturn
+
+Param | type | Description
+------|------|------------
+$modelObject | object | Laravel Eloquent model object
+$document | object | HackerBoy\JsonApi\Document object
+
+## Get resource collection events
+
+These events will be triggered in GET request for resource collection.
+
+### collection.query
+
+This event will be triggered before the get query is executed.
+
+Param | type | Description
+------|------|------------
+$modelClass | string | Model class name
+$query | object | Laravel query object
+
+### collection.afterQuery
+
+This event will be triggered after the get query is executed.
+
+Param | type | Description
+------|------|------------
+$collection | object | Laravel Collection of model objects
+
+### collection.beforeReturn
+
+Param | type | Description
+------|------|------------
+$collection | object | Laravel Collection of model objects
+$document | object | HackerBoy\JsonApi\Document object
+
+## Create resource events
+
+### post.saving
+
+This event will be triggered before the save query is executed.
+
+Param | type | Description
+------|------|------------
+$model | object | Laravel model object
+
+### post.saved
+
+This event will be triggered after the save query is executed.
+
+Param | type | Description
+------|------|------------
+$model | object | Laravel model object
+
+## Update resource events
+
+### patch.query
+
+This event will be triggered before the finding query is executed.
+
+Param | type | Description
+------|------|------------
+$modelClass | string | Model class name
+$query | object | Laravel database query object
+
+### patch.saving
+
+This event will be triggered before the save query is executed.
+
+Param | type | Description
+------|------|------------
+$model | object | Laravel model object
+
+### patch.saved
+
+This event will be triggered after the save query is executed.
+
+Param | type | Description
+------|------|------------
+$model | object | Laravel model object
+
+## Delete resource events
+
+### delete.query
+
+This event will be triggered before the finding query is executed.
+
+Param | type | Description
+------|------|------------
+$modelClass | string | Model class name
+$query | object | Laravel database query object
+
+### delete.deleting
+
+This event will be triggered before the delete query is executed.
+
+Param | type | Description
+------|------|------------
+$model | object | Laravel model object
+
+### delete.deleted
+
+This event will be triggered after the delete query is executed.
+
+Param | type | Description
+------|------|------------
+$model | object | Laravel model object
+
+### delete.beforeReturn
+
+This event will be triggered before returning.
+
+Param | type | Description
+------|------|------------
+$model | object | Laravel model object
+$document | object | HackerBoy\JsonApi\Document object
+
+## Relationships events
+
+### relationships.beforeReturn
+
+This event will be triggered in get relationships request (For example: /api/posts/1/comments).
+
+Param | type | Description
+------|------|------------
+$model | object | Laravel model object
+$relationshipName | string | Relationship name
+$document | object | HackerBoy\JsonApi\Document object
+
+### relationships.saving
+
+This event will be triggered before the relationships be saved.
+
+Param | type | Description
+------|------|------------
+$model | object | Laravel model object
+$relationshipName | string | Relationship name
+$relationshipData | array | The relationship data
+
+
+### relationships.saving
+
+This event will be triggered after the relationships be saved.
+
+Param | type | Description
+------|------|------------
+$model | object | Laravel model object
+$relationshipName | string | Relationship name
+$relationshipData | array | The relationship data
 
 # API Syntax
 ## Sorting results
