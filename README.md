@@ -311,7 +311,7 @@ return [
                 'updated_at' => function($query, $sortType) {
 
                     // Custom sorting handler
-                    $query->orderBy($query, $sortType);
+                    $query->orderBy('updated_at', $sortType);
                 } 
             ],
 
@@ -325,7 +325,7 @@ return [
 
 You can set which fields are allowed for filtering and custom query (check [API Syntax](#api-syntax)) by using `filter` config element nested inside [Resource Config](#resource-config).
 
-By default, field listed in `filter` will support the following query operator: `=, !=, >, <, >=, <=`. You can also define your custom query handler. For example:
+By default, fields listed in `filter` will support the following query operator: `=, !=, >, <, >=, <=`. You can also define your custom query handler. For example:
 
 
 ```
@@ -672,7 +672,7 @@ Query object is a JSON object for querying results from API. Below is the introd
 ```
 {
     "field": "...", // Required, field name for query
-    "type": "...", // Optional, possible values: basic, null, notNull. Default is "basic"
+    "type": "...", // Optional, possible values: basic, null (for $query->whereNull()), notNull (for $query->whereNotNull()). Default is "basic"
     "value": "...", // Required if type is "basic"
     "operator": "...", // Optional, possible values: =, !=, >, <, >=, <=. Default is "="
     "boolean": "...", // Optional, determine "where operator", possible values: "and", "or". Default: "and"
