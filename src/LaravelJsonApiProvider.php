@@ -16,16 +16,16 @@ class LaravelJsonApiProvider extends ServiceProvider
         $this->routes();
     }
 
-	/**
+    /**
      * Register any application services.
      *
      * @return void
      */
     public function register()
     {
-    	$this->app->singleton('laravel-json-api', function($app) {
-    		return new LaravelJsonApi(config('laravel_jsonapi'));
-    	});
+        $this->app->singleton('laravel-json-api', function($app) {
+            return new LaravelJsonApi(config('laravel_jsonapi'));
+        });
     }
 
     /**
@@ -35,7 +35,7 @@ class LaravelJsonApiProvider extends ServiceProvider
      */
     protected function routes()
     {
-       	app()->make('laravel-json-api')->getRouter()->generate();
+           app()->make('laravel-json-api')->getRouter()->generate();
     }
 
 }

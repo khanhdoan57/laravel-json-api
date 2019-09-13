@@ -7,69 +7,69 @@ use Illuminate\Database\Eloquent\Model;
 
 class Authorization {
 
-	private static $usePolicies = false;
-	private static $user = null;
+    private static $usePolicies = false;
+    private static $user = null;
 
-	public static function check($scope, $model, $throwException = true)
-	{
-		self::setConfig();
-		
-		$pass = true;
+    public static function check($scope, $model, $throwException = true)
+    {
+        self::setConfig();
+        
+        $pass = true;
 
-		if (!self::$usePolicies) {
-			return true;
-		}
+        if (!self::$usePolicies) {
+            return true;
+        }
 
-		try {
+        try {
 
-			if (!self::$user) {
-				$pass = false;
-			} elseif (!self::$user->can($scope, $model)) {
-				$pass = false;
-			}
-			
-		} catch (\Exception $e) {
-			$pass = false;
-		}
+            if (!self::$user) {
+                $pass = false;
+            } elseif (!self::$user->can($scope, $model)) {
+                $pass = false;
+            }
+            
+        } catch (\Exception $e) {
+            $pass = false;
+        }
 
-		if (!$pass and $throwException) {
+        if (!$pass and $throwException) {
 
-			$className = is_object($model) ? get_class($model) : $model;
+            $className = is_object($model) ? get_class($model) : $model;
 
-			if (is_object($model) and $model instanceof Model) {
-				$errorTitle = 'You dont have permission to '.$scope.' resource ['.JsonApi::getResourceTypeByModelClass($className).':'.$model->{$model->getKeyName()}.']';
-			} else {
-				$errorTitle = 'You dont have permission to '.$scope.' "'.JsonApi::getResourceTypeByModelClass($className).'" resources';
-			}
+            if (is_object($model) and $model instanceof Model) {
+                $errorTitle = 'You dont have permission to '.$scope.' resource ['.JsonApi::getResourceTypeByModelClass($className).':'.$model->{$model->getKeyName()}.']';
+            } else {
+                $errorTitle = 'You dont have permission to '.$scope.' "'.JsonApi::getResourceTypeByModelClass($className).'" resources';
+            }
 
-			throw new JsonApiException([
-				'errors' => [
-					'title' => $errorTitle
-				],
-				'statusCode' => 403
-			]);
+            throw new JsonApiException([
+                'errors' => [
+                    'title' => $errorTitle
+                ],
+                'statusCode' => 403
+            ]);
 
-		}
+        }
 
-		return $pass;
-	}
+        return $pass;
+    }
 
-	public static function setConfig()
-	{
-		$config = app()->make('laravel-json-api')->getConfig();
+    public static function setConfig()
+    {
+        $config = app()->make('laravel-json-api')->getConfig();
 
-		self::$user = (isset($config['user_resolver']) and is_callable($config['user_resolver'])) ? call_user_func($config['user_resolver']) : \Auth::user();
-		self::$usePolicies = isset($config['use_policies']) ? $config['use_policies'] : false;
+        self::$user = (isset($config['user_resolver']) and is_callable($config['user_resolver'])) ? call_user_func($config['user_resolver']) : \Auth::user();
+        self::$usePolicies = isset($config['use_policies']) ? $config['use_policies'] : false;
 
-		if (@$config['allow_guest_users'] and !self::$user) {
+        if (@$config['allow_guest_users'] and !self::$user) {
 
-			if (isset($config['guest_user_resolver']) and is_callable($config['guest_user_resolver'])) {
-				self::$user = call_user_func($config['guest_user_resolver']);
-			} elseif (class_exists('\App\User')) {
-				self::$user = new \App\User;
-			}
+            if (isset($config['guest_user_resolver']) and is_callable($config['guest_user_resolver'])) {
+                self::$user = call_user_func($config['guest_user_resolver']);
+            } elseif (class_exists('\App\User')) {
+                self::$user = new \App\User;
+            }
 
-		}
-	}
+        }
+    }
 
 }

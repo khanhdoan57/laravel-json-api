@@ -3,12 +3,12 @@
 namespace HackerBoy\LaravelJsonApi\Exceptions;
 
 class JsonApiException extends \Exception {
-	
-	protected $jsonApiErrors;
+    
+    protected $jsonApiErrors;
 
-	protected $statusCode;
+    protected $statusCode;
 
-	public function __construct($errors = [])
+    public function __construct($errors = [])
     {
         $this->jsonApiErrors = isset($errors['errors']) ? $errors['errors'] : ['title' => 'Unknown error'];
 
@@ -17,11 +17,11 @@ class JsonApiException extends \Exception {
 
     public function getErrors()
     {
-    	return $this->jsonApiErrors;
+        return $this->jsonApiErrors;
     }
 
     public function getStatusCode()
     {
-    	return $this->statusCode;
+        return $this->statusCode;
     }
 }

@@ -20,34 +20,34 @@ class ModelHelper {
 
     public static function removeUnauthorizedResources(&$collection)
     {
-    	// Sort by class
-    	$sortByClass = [];
+        // Sort by class
+        $sortByClass = [];
 
-    	$finalData = [];
+        $finalData = [];
 
-    	foreach ($collection as $modelObject) {
-    		
-    		$className = get_class($modelObject);
+        foreach ($collection as $modelObject) {
+            
+            $className = get_class($modelObject);
 
-    		if (!isset($sortByClass[$className])) {
-    			$sortByClass[$className] = [];
-    		}
+            if (!isset($sortByClass[$className])) {
+                $sortByClass[$className] = [];
+            }
 
-    		$sortByClass[$className][] = $modelObject;
+            $sortByClass[$className][] = $modelObject;
 
-    	}
+        }
 
-    	foreach ($sortByClass as $className => $data) {
-	
-			// Done have permission    		
-    		if (!Authorization::check('viewAny', $className, false)) {
-    			unset($sortByClass[$className]);
-    			continue;
-    		}
+        foreach ($sortByClass as $className => $data) {
+    
+            // Done have permission            
+            if (!Authorization::check('viewAny', $className, false)) {
+                unset($sortByClass[$className]);
+                continue;
+            }
 
-    		$finalData = array_merge($finalData, $data);
+            $finalData = array_merge($finalData, $data);
 
-    	}
+        }
 
         // Deep policy check
         if (!isset(app()->make('laravel-json-api')->getConfig()['deep_policy_check']) or app()->make('laravel-json-api')->getConfig()['deep_policy_check']) {
@@ -62,7 +62,7 @@ class ModelHelper {
 
         }
 
-    	if ($collection instanceof Collection) {
+        if ($collection instanceof Collection) {
             return $collection = collect($finalData);
         }
 
