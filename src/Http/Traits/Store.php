@@ -21,7 +21,7 @@ trait Store {
     * @return Model
     */
     protected function store($resourceModel, $asMethod = 'post')
-    {    
+    {
         // Protect data by a transaction
         \DB::transaction(function() use ($resourceModel, $asMethod) {
 

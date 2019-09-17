@@ -3,6 +3,7 @@
 namespace HackerBoy\LaravelJsonApi;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Validator;
 
 class LaravelJsonApiProvider extends ServiceProvider
 {
@@ -14,6 +15,15 @@ class LaravelJsonApiProvider extends ServiceProvider
     public function boot()
     {
         $this->routes();
+
+        // Custom validation rule
+        Validator::extend('not_fillable', function ($attribute, $value, $parameters, $validator) {
+            return false;
+        });
+
+        Validator::replacer('not_fillable', function ($message, $attribute, $rule, $parameters) {
+            return 'Attribute '.$attribute.' is not allowed';
+        });
     }
 
     /**
@@ -35,7 +45,7 @@ class LaravelJsonApiProvider extends ServiceProvider
      */
     protected function routes()
     {
-           app()->make('laravel-json-api')->getRouter()->generate();
+        app()->make('laravel-json-api')->getRouter()->generate();
     }
 
 }

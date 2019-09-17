@@ -481,7 +481,7 @@ class Controller extends BaseController {
             }
 
             // Save resource
-            $this->store($resourceModel);
+            $this->store($resourceModel, 'patch');
 
             return $this->get($resourceModel, 'patch');
 
