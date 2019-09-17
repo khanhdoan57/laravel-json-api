@@ -261,6 +261,8 @@ return [
 ];
 ```
 
+What if I want an attribute be fillable for "post" requests but not fillable for "patch" requests? It's easy, simply using validation rule `not_fillable` (this validation rule is implemented by this package), for more detail, see the example in [Validation](#validation) section
+
 ### Validation
 
 You can set validation rules for write requests using [Laravel Validation](https://laravel.com/docs/5.8/validation#available-validation-rules). Validation config for a model are nested inside [Resource Config](#resource-config). You should set validation rules for both "post" and "patch" requests. For example
@@ -282,7 +284,7 @@ return [
                     'password' => 'required|min:6'
                 ],
                 'patch' => [
-                    'email' => 'email',
+                    'email' => 'not_fillable', // Email is not allowed by updating
                     'name' => 'min:6',
                     'password' => 'min:6'
                 ]
