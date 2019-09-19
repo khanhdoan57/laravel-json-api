@@ -153,193 +153,199 @@ trait Store {
     * @param array data
     * @return void
     */
-    private function makeRelationships($resourceModel, $relationshipData, $isRelationshipRequest = false)
+    protected function makeRelationships($resourceModel, $relationshipData, $isRelationshipRequest = false)
     {
-        $modelClass = get_class($resourceModel);
+        // DB transaction
+        \DB::transaction(function() use ($resourceModel, $relationshipData, $isRelationshipRequest) {
 
-        foreach ($relationshipData as $relationshipName => $relationshipData) {
+            $modelClass = get_class($resourceModel);
 
-            if (array_key_exists('write', ($this->config['resources'][$modelClass]['relationships'][$relationshipName]))) {
+            foreach ($relationshipData as $relationshipName => $relationshipData) {
 
-                // If write option is off
-                if (!$this->config['resources'][$modelClass]['relationships'][$relationshipName]['write']) {
-                    continue;
-                }
+                if (array_key_exists('write', ($this->config['resources'][$modelClass]['relationships'][$relationshipName]))) {
 
-                // Custom handler
-                if (is_callable($this->config['resources'][$modelClass]['relationships'][$relationshipName]['write'])) {
-                    call_user_func_array($this->config['resources'][$modelClass]['relationships'][$relationshipName]['write'], [$resourceModel, $relationshipData]);
-                    continue;
-                }
-                
-            }
-            
-            // Auto handler
-            if (isset($this->config['resources'][$modelClass]['relationships'][$relationshipName]['property'])
-                and $property = $this->config['resources'][$modelClass]['relationships'][$relationshipName]['property']
-                and method_exists($modelClass, $property)
-                and (($relationshipObject = $resourceModel->{$property}()) instanceof Relation)
-            ) {
-
-                // Morph to one - go first because it's child class
-                if ($relationshipObject instanceof Relations\MorphTo) {
-
-                    // Support only patch
-                    if ($isRelationshipRequest and !$this->request->isMethod('patch')) {
-                        throw new JsonApiException([
-                            'errors' => [
-                                'title' => 'Request method '.$this->request->method().' is not supported'
-                            ],
-                            'statusCode' => 403
-                        ]);
+                    // If write option is off
+                    if (!$this->config['resources'][$modelClass]['relationships'][$relationshipName]['write']) {
+                        continue;
                     }
 
-                    $this->morphToRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData);
-                    continue;
+                    // Custom handler
+                    if (is_callable($this->config['resources'][$modelClass]['relationships'][$relationshipName]['write'])) {
+                        call_user_func_array($this->config['resources'][$modelClass]['relationships'][$relationshipName]['write'], [$resourceModel, $relationshipData]);
+                        continue;
+                    }
+                    
                 }
+                
+                // Auto handler
+                if (isset($this->config['resources'][$modelClass]['relationships'][$relationshipName]['property'])
+                    and $property = $this->config['resources'][$modelClass]['relationships'][$relationshipName]['property']
+                    and method_exists($modelClass, $property)
+                    and (($relationshipObject = $resourceModel->{$property}()) instanceof Relation)
+                ) {
 
-                // Morph and belongs to many
-                if ($relationshipObject instanceof Relations\BelongsToMany) {
+                    // Morph to one - go first because it's child class
+                    if ($relationshipObject instanceof Relations\MorphTo) {
 
-                    // Support only patch
-                    if ($isRelationshipRequest) {
-
-                        if (!in_array($this->request->method(), ['POST', 'PATCH', 'DELETE'])) {
-
+                        // Support only patch
+                        if ($isRelationshipRequest and !$this->request->isMethod('patch')) {
                             throw new JsonApiException([
                                 'errors' => [
                                     'title' => 'Request method '.$this->request->method().' is not supported'
                                 ],
                                 'statusCode' => 403
                             ]);
-
                         }
 
-                        // Append relationship - not replacing
-                        if ($this->request->isMethod('post')) {
-                            $this->belongsToManyRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData, false);
-                            continue;
+                        $this->morphToRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData);
+                        continue;
+                    }
+
+                    // Morph and belongs to many
+                    if ($relationshipObject instanceof Relations\BelongsToMany) {
+
+                        // Support only patch
+                        if ($isRelationshipRequest) {
+
+                            if (!in_array($this->request->method(), ['POST', 'PATCH', 'DELETE'])) {
+
+                                throw new JsonApiException([
+                                    'errors' => [
+                                        'title' => 'Request method '.$this->request->method().' is not supported'
+                                    ],
+                                    'statusCode' => 403
+                                ]);
+
+                            }
+
+                            // Append relationship - not replacing
+                            if ($this->request->isMethod('post')) {
+                                $this->belongsToManyRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData, false);
+                                continue;
+                            }
+
+                            // Delete relationship
+                            if ($this->request->isMethod('delete')) {
+                                $this->belongsToManyRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData, 'delete');
+                                continue;
+                            }
+                            
                         }
 
-                        // Delete relationship
-                        if ($this->request->isMethod('delete')) {
-                            $this->belongsToManyRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData, 'delete');
-                            continue;
+                        $this->belongsToManyRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData, 'replace');
+                        continue;
+                    }
+
+                    // Morph one
+                    if ($relationshipObject instanceof Relations\MorphOne) {
+
+                        // Support only patch
+                        if ($isRelationshipRequest and !$this->request->isMethod('patch')) {
+                            throw new JsonApiException([
+                                'errors' => [
+                                    'title' => 'Request method '.$this->request->method().' is not supported'
+                                ],
+                                'statusCode' => 403
+                            ]);
                         }
-                        
+
+                        $this->morphOneOrManyRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData);
+                        continue;
                     }
 
-                    $this->belongsToManyRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData, 'replace');
-                    continue;
-                }
+                    // Morph many
+                    if ($relationshipObject instanceof Relations\MorphMany) {
 
-                // Morph one
-                if ($relationshipObject instanceof Relations\MorphOne) {
+                        // Support only post
+                        if ($isRelationshipRequest and !$this->request->isMethod('post')) {
+                            throw new JsonApiException([
+                                'errors' => [
+                                    'title' => 'Request method '.$this->request->method().' is not defined.'
+                                ],
+                                'statusCode' => 403
+                            ]);
+                        }
 
-                    // Support only patch
-                    if ($isRelationshipRequest and !$this->request->isMethod('patch')) {
-                        throw new JsonApiException([
-                            'errors' => [
-                                'title' => 'Request method '.$this->request->method().' is not supported'
-                            ],
-                            'statusCode' => 403
-                        ]);
+                        $this->morphOneOrManyRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData, true);
+                        continue;
                     }
 
-                    $this->morphOneOrManyRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData);
-                    continue;
-                }
+                    // Has one
+                    if ($relationshipObject instanceof Relations\HasOne) {
 
-                // Morph many
-                if ($relationshipObject instanceof Relations\MorphMany) {
+                        // Support only patch
+                        if ($isRelationshipRequest and !$this->request->isMethod('patch')) {
+                            throw new JsonApiException([
+                                'errors' => [
+                                    'title' => 'Request method '.$this->request->method().' is not supported'
+                                ],
+                                'statusCode' => 403
+                            ]);
+                        }
 
-                    // Support only post
-                    if ($isRelationshipRequest and !$this->request->isMethod('post')) {
-                        throw new JsonApiException([
-                            'errors' => [
-                                'title' => 'Request method '.$this->request->method().' is not defined.'
-                            ],
-                            'statusCode' => 403
-                        ]);
+                        $this->hasOneOrManyRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData, false);
+                        continue;
                     }
 
-                    $this->morphOneOrManyRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData, true);
-                    continue;
-                }
+                    // Has many
+                    if ($relationshipObject instanceof Relations\HasMany) {
 
-                // Has one
-                if ($relationshipObject instanceof Relations\HasOne) {
+                        // Support only post
+                        if ($isRelationshipRequest and !$this->request->isMethod('post')) {
+                            throw new JsonApiException([
+                                'errors' => [
+                                    'title' => 'Request method '.$this->request->method().' is not defined.'
+                                ],
+                                'statusCode' => 403
+                            ]);
+                        }
 
-                    // Support only patch
-                    if ($isRelationshipRequest and !$this->request->isMethod('patch')) {
-                        throw new JsonApiException([
-                            'errors' => [
-                                'title' => 'Request method '.$this->request->method().' is not supported'
-                            ],
-                            'statusCode' => 403
-                        ]);
+                        $this->hasOneOrManyRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData, true);
+                        continue;
                     }
 
-                    $this->hasOneOrManyRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData, false);
-                    continue;
-                }
+                    // Belongs to one
+                    if ($relationshipObject instanceof Relations\BelongsTo) {
 
-                // Has many
-                if ($relationshipObject instanceof Relations\HasMany) {
+                        // Support only patch
+                        if ($isRelationshipRequest and !$this->request->isMethod('patch')) {
+                            throw new JsonApiException([
+                                'errors' => [
+                                    'title' => 'Request method '.$this->request->method().' is not supported'
+                                ],
+                                'statusCode' => 403
+                            ]);
+                        }
 
-                    // Support only post
-                    if ($isRelationshipRequest and !$this->request->isMethod('post')) {
-                        throw new JsonApiException([
-                            'errors' => [
-                                'title' => 'Request method '.$this->request->method().' is not defined.'
-                            ],
-                            'statusCode' => 403
-                        ]);
+                        $this->belongsToRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData);
+                        continue;
                     }
 
-                    $this->hasOneOrManyRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData, true);
-                    continue;
-                }
-
-                // Belongs to one
-                if ($relationshipObject instanceof Relations\BelongsTo) {
-
-                    // Support only patch
-                    if ($isRelationshipRequest and !$this->request->isMethod('patch')) {
-                        throw new JsonApiException([
-                            'errors' => [
-                                'title' => 'Request method '.$this->request->method().' is not supported'
-                            ],
-                            'statusCode' => 403
-                        ]);
+                    // Has one through
+                    if ($relationshipObject instanceof Relations\HasOneThrough) {
+                        $this->hasOneOrManyThroughRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData);
+                        continue;
                     }
 
-                    $this->belongsToRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData);
-                    continue;
-                }
+                    // Has many through
+                    if ($relationshipObject instanceof Relations\HasManyThrough) {
+                        $this->hasOneOrManyThroughRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData, true);
+                        continue;
+                    }
 
-                // Has one through
-                if ($relationshipObject instanceof Relations\HasOneThrough) {
-                    $this->hasOneOrManyThroughRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData);
-                    continue;
-                }
+                    throw new JsonApiException([
+                        'errors' => [
+                            'title' => 'No handler found for relationship '.$relationshipName
+                        ],
+                        'statusCode' => 500
+                    ]);
 
-                // Has many through
-                if ($relationshipObject instanceof Relations\HasManyThrough) {
-                    $this->hasOneOrManyThroughRelationshipMaker($resourceModel, $relationshipObject, $relationshipName, $relationshipData, true);
-                    continue;
                 }
-
-                throw new JsonApiException([
-                    'errors' => [
-                        'title' => 'No handler found for relationship '.$relationshipName
-                    ],
-                    'statusCode' => 500
-                ]);
 
             }
 
-        }
+        });
+        
     }
 
     /**
@@ -351,7 +357,7 @@ trait Store {
     * @param array Relationship data
     * @return voild
     */
-    private function morphToRelationshipMaker($modelObject, $relationshipObject, $relationshipName, $relationshipData)
+    protected function morphToRelationshipMaker($modelObject, $relationshipObject, $relationshipName, $relationshipData)
     {
         if (!isset($relationshipData['data'])) {
             return false;
@@ -431,7 +437,7 @@ trait Store {
     * @param array Relationship data
     * @return voild
     */
-    private function belongsToManyRelationshipMaker($modelObject, $relationshipObject, $relationshipName, $relationshipData, $type = 'replace')
+    protected function belongsToManyRelationshipMaker($modelObject, $relationshipObject, $relationshipName, $relationshipData, $type = 'replace')
     {
         if (!isset($relationshipData['data'])) {
             return;
@@ -588,7 +594,7 @@ trait Store {
     * @param bool Is many?
     * @return voild
     */
-    private function morphOneOrManyRelationshipMaker($modelObject, $relationshipObject, $relationshipName, $relationshipData, $isMany = false)
+    protected function morphOneOrManyRelationshipMaker($modelObject, $relationshipObject, $relationshipName, $relationshipData, $isMany = false)
     {
         if (!isset($relationshipData['data'])) {
             return;
@@ -694,7 +700,7 @@ trait Store {
     * @param array Relationship data
     * @return voild
     */
-    private function hasOneOrManyRelationshipMaker($modelObject, $relationshipObject, $relationshipName, $relationshipData, $isMany = false)
+    protected function hasOneOrManyRelationshipMaker($modelObject, $relationshipObject, $relationshipName, $relationshipData, $isMany = false)
     {
         if (!isset($relationshipData['data'])) {
             return false;
@@ -778,7 +784,7 @@ trait Store {
     * @param array Relationship data
     * @return voild
     */
-    private function belongsToRelationshipMaker($modelObject, $relationshipObject, $relationshipName, $relationshipData, $isMany = false)
+    protected function belongsToRelationshipMaker($modelObject, $relationshipObject, $relationshipName, $relationshipData, $isMany = false)
     {
         if (!isset($relationshipData['data'])) {
             return false;
@@ -847,7 +853,7 @@ trait Store {
     * @param bool Is many?
     * @return voild
     */
-    private function hasOneOrManyThroughRelationshipMaker($modelObject, $relationshipObject, $relationshipName, $relationshipData, $isMany = false)
+    protected function hasOneOrManyThroughRelationshipMaker($modelObject, $relationshipObject, $relationshipName, $relationshipData, $isMany = false)
     {
         throw new JsonApiException([
             'errors' => [
