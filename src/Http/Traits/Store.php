@@ -419,7 +419,7 @@ trait Store {
         }
 
         // Save without observer events
-        $this->saveWithoutEvents($modelObject);
+        $this->saveRelationshipModel($modelObject, $relationshipName);
 
         // Callback
         if (isset($this->config['events']['relationships.saved']) and is_callable($this->config['events']['relationships.saved'])) {
@@ -671,7 +671,7 @@ trait Store {
                 call_user_func_array($this->config['events']['relationships.saving'], [$modelObject, $relationshipName, $relationshipData]);
             }
 
-            $this->saveWithoutEvents($relatedModelObject);
+            $this->saveRelationshipModel($relatedModelObject, $relationshipName);
 
             // Callback
             if (isset($this->config['events']['relationships.saved']) and is_callable($this->config['events']['relationships.saved'])) {
@@ -754,7 +754,7 @@ trait Store {
                 call_user_func_array($this->config['events']['relationships.saving'], [$modelObject, $relationshipName, $relationshipData]);
             }
 
-            $this->saveWithoutEvents($find);
+            $this->saveRelationshipModel($find, $relationshipName);
 
             // Callback
             if (isset($this->config['events']['relationships.saved']) and is_callable($this->config['events']['relationships.saved'])) {
@@ -835,7 +835,7 @@ trait Store {
 
         // Update
         $modelObject->{$relationshipObject->getForeignKeyName()} = $find->{$find->getKeyName()};
-        $this->saveWithoutEvents($modelObject);
+        $this->saveRelationshipModel($modelObject, $relationshipName);
 
         // Callback
         if (isset($this->config['events']['relationships.saved']) and is_callable($this->config['events']['relationships.saved'])) {
@@ -866,14 +866,27 @@ trait Store {
     /**
     * Save a model without triggering events
     */
-    protected function saveWithoutEvents($modelObject)
+    protected function saveRelationshipModel($modelObject, $relationshipName)
     {
         // Check permission
-        Authorization::check('update', $modelObject);
+        Authorization::check($modelObject->exists ? 'update' : 'create', $modelObject);
 
-        $dispatcher = $modelObject->getEventDispatcher();
-        $modelObject->unsetEventDispatcher();
-        $modelObject->save();
-        $modelObject->setEventDispatcher($dispatcher);
+        // If not using observer
+        if (isset($this->config['resources'][get_class($modelObject)]['relationships'][$relationshipName]['use_observers'])
+            and !$this->config['resources'][get_class($modelObject)]['relationships'][$relationshipName]['use_observers']
+        ) {
+
+            $dispatcher = $modelObject->getEventDispatcher();
+            $modelObject->unsetEventDispatcher();
+            $save = $modelObject->save();
+            $modelObject->setEventDispatcher($dispatcher);
+
+            return $save;
+
+        }
+
+        // Save normally
+        return $modelObject->save();
+        
     }
 }
