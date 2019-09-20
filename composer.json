@@ -3,7 +3,7 @@
     "description": "Auto JSON:API generator for Laravel framework",
     "type": "library",
     "require": {
-        "hackerboy/json-api": "^1.2",
+        "hackerboy/json-api": "^2.0",
         "art4/json-api-client": "^0.10.0",
         "php": ">=7.1.0"
     },
