@@ -78,7 +78,7 @@ class Controller extends BaseController {
             $this->document->setData($resource);
 
             // Resource instance
-            $jsonApiResource = $this->document->getResourceInstance($resource);
+            $jsonApiResource = $this->document->getResource($resource);
 
             // Get relationships
             $relationships = $jsonApiResource->getRelationships($resource);
@@ -167,7 +167,7 @@ class Controller extends BaseController {
             }
 
             // Relationship not found
-            $resourceInstance = $this->document->getResourceInstance($resource);
+            $resourceInstance = $this->document->getResource($resource);
             $resourceRelationships = $resourceInstance->getRelationships($resource);
 
             if (!array_key_exists($relationshipName, $resourceRelationships)) {
@@ -393,7 +393,7 @@ class Controller extends BaseController {
 
             foreach ($collection as $resource) {
 
-                $resourceRelationships = $this->document->getResourceInstance($resource)->getRelationships($resource);
+                $resourceRelationships = $this->document->getResource($resource)->getRelationships($resource);
 
                 // Set included resources
                 foreach ($resourceRelationships as $relationshipName => $relationshipResourceData) {

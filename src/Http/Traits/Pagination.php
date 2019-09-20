@@ -37,7 +37,7 @@ trait Pagination {
 
         // Get resource type
         $newModel = new $this->modelClass;
-        $resourceInstance = $this->document->getResourceInstance($newModel);
+        $resourceInstance = $this->document->getResource($newModel);
         $resourceType = $resourceInstance->getType($newModel);
         unset($newModel);
 

@@ -53,7 +53,7 @@ trait Store {
             }
 
             // Validate resource type
-            $resourceInstance = $this->document->getResourceInstance($resourceModel);
+            $resourceInstance = $this->document->getResource($resourceModel);
             $resourceType = $resourceInstance->getType($resourceModel);
 
             if ($data['data']['type'] !== $resourceType) {
