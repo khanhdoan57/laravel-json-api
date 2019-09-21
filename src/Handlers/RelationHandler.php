@@ -124,7 +124,7 @@ class RelationHandler extends Relation {
 	public static function setCustomRelationshipDataLimit($limit)
 	{
 		$limit = intval($limit);
-		$limit = $limit > 1 ? $limit : 1;
+		$limit = $limit > 1 ? $limit : null;
 		static::$customRelationshipDataLimit = $limit;
 	}
 

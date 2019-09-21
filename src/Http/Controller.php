@@ -441,7 +441,7 @@ class Controller extends BaseController {
                     }
 
                     $relationshipResourceData = isset($relationshipResourceData['data']) ? $relationshipResourceData['data'] : $relationshipResourceData;
-                    
+
                     // Add included resources to mixed collection
                     $this->mergeModelDataToArray($includedCollection, $relationshipResourceData);
                     
