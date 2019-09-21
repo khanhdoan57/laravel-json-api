@@ -60,7 +60,7 @@ trait CollectionRelationshipResolver {
         }
 
         $newResourceInstance = $this->document->getResource($newModel);
-        $relationshipNames = array_keys($newResourceInstance->getRelationships($newModel));
+        $relationshipNames = array_keys($newResourceInstance->getRelationships());
 
         foreach ($relationshipNames as $relationshipName) {
 

@@ -21,8 +21,10 @@ class LaravelJsonApi {
     * Example of config:
     * $config = [
     *    'jsonapi_config' => 'jsonapi', // If your config is /config/jsonapi.php
-    *    'result_limit' => 20,
-    *    'maximum_result_limit' => 'api',
+    *    'result_limit' => 20, // Default 20
+    *    'maximum_result_limit' => 100, // Default 100
+    *    'relationship_result_limit' => 20, // Default 20
+    *    'relationship_maximum_result_limit' => 100, // Default 100
     *    'prefix' => 'api',
     *    'use_policies' => true, // Check policy
     *    'deep_policy_check' => false, // Check policy "view" permission on every single resource in collection
@@ -142,6 +144,17 @@ class LaravelJsonApi {
 
         // Init controller
         $this->router = new Http\Router($this->document, $this->config);
+    }
+
+    /**
+    * Get document
+    *
+    * @param void
+    * @return \HackerBoy\JsonApi\Document
+    */
+    public function getDocument()
+    {
+        return $this->document;
     }
 
     /**

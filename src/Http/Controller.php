@@ -13,6 +13,7 @@ use HackerBoy\JsonApi\Document;
 use HackerBoy\LaravelJsonApi\Exceptions\JsonApiException;
 use HackerBoy\LaravelJsonApi\Helpers\Authorization;
 use HackerBoy\LaravelJsonApi\Helpers\ModelHelper;
+use HackerBoy\LaravelJsonApi\Handlers\RelationHandler;
 
 class Controller extends BaseController {
 
@@ -81,11 +82,12 @@ class Controller extends BaseController {
             $jsonApiResource = $this->document->getResource($resource);
 
             // Get relationships
-            $relationships = $jsonApiResource->getRelationships($resource);
+            $relationships = $jsonApiResource->getRelationships();
 
             // Set included resources
             $includedData = [];
 
+            // Optimize relationships
             foreach ($relationships as $relationshipName => $relationshipResourceData) {
 
                 if (isset($this->config['resources'][$this->modelClass]['relationships'][$relationshipName]['included']) and !in_array($asMethod, $this->config['resources'][$this->modelClass]['relationships'][$relationshipName]['included'])) {
@@ -109,8 +111,10 @@ class Controller extends BaseController {
                 $this->mergeModelDataToArray($includedData, $_includedData);
             }
 
+            // Remove unauthorized resources
             ModelHelper::removeUnauthorizedResources($includedData);
 
+            // Add included data
             $this->document->addIncluded($includedData);
 
             // Callback
@@ -166,9 +170,16 @@ class Controller extends BaseController {
 
             }
 
+            // Pagination
+            list($page) = $this->requestPagination();
+
+            // Set relationship current page and limit (for relationship pagination)
+            RelationHandler::setCurrentRelationshipPage($page);
+            RelationHandler::setCustomRelationshipDataLimit($this->request->query('limit'));
+
             // Relationship not found
             $resourceInstance = $this->document->getResource($resource);
-            $resourceRelationships = $resourceInstance->getRelationships($resource);
+            $resourceRelationships = $resourceInstance->getRelationships();
 
             if (!array_key_exists($relationshipName, $resourceRelationships)) {
 
@@ -183,24 +194,44 @@ class Controller extends BaseController {
 
             // Return data as relationship
             $data = $resourceRelationships[$relationshipName];
+            $relationshipResources = null;
+
+            // Set relationship data
+            if (isset($data['data'])) {
+                $relationshipData = $data['data'];
+            } else {
+                $relationshipData = $data;
+            }
+
+            // No results
+            if (!count($relationshipData)) {
+
+                throw new JsonApiException([
+                    'errors' => [
+                        'title' => 'No results'
+                    ],
+                    'statusCode' => 404
+                ]);
+
+            }
 
             if ($dataType === 'relationships') {
-                $this->document->setData($data, $dataType);
+                $this->document->setData($relationshipData, $dataType);
             } else {
 
                 // If not a single resource - optimize query
-                if (!($data instanceof Model) and is_iterable($data)) {
+                if (!($relationshipData instanceof Model) and is_iterable($relationshipData)) {
 
                     // Get resource model class
                     $modelClass = null;
 
                     // Single resource
-                    if ($data instanceof Model) {
-                        $modelClass = get_class($data);
-                    } elseif ($data instanceof Collection and $firstResource = $data->first()) { // Collection
+                    if ($relationshipData instanceof Model) {
+                        $modelClass = get_class($relationshipData);
+                    } elseif ($relationshipData instanceof Collection and $firstResource = $relationshipData->first()) { // Collection
                         $modelClass = get_class($firstResource);
-                    } elseif (is_array($data) and isset($data[0])) { // Collection as array
-                        $modelClass = get_class($data[0]);
+                    } elseif (is_array($relationshipData) and isset($relationshipData[0])) { // Collection as array
+                        $modelClass = get_class($relationshipData[0]);
                     }
 
                     // Cannot get model class
@@ -218,12 +249,14 @@ class Controller extends BaseController {
                     $this->modelClass = $modelClass;
 
                     // Return as collection
-                    return $this->collection($data, 'relationshipData');
+                    return $this->collection($relationshipData, 'relationshipData', isset($data['links']) ? $data['links'] : []);
                     
-                } elseif ($data instanceof Model) { // Single resource
+                } elseif ($relationshipData instanceof Model) { // Single resource
 
-                    $this->modelClass = get_class($data);
-                    return $this->get($data, 'relationshipData');
+                    $this->modelClass = get_class($relationshipData);
+
+                    // Return as single resource
+                    return $this->get($relationshipData, 'relationshipData');
 
                 } else {
 
@@ -237,6 +270,11 @@ class Controller extends BaseController {
                 }
                 
 
+            }
+
+            // If links member is set
+            if (isset($data['links'])) {
+                $this->document->setLinks($data['links']);
             }
 
             // Callback
@@ -317,7 +355,7 @@ class Controller extends BaseController {
     * @param void
     * @return Response
     */
-    public function collection($data = [], $asMethod = 'collection')
+    public function collection($data = [], $asMethod = 'collection', $links = [], $meta = [])
     {
         try {
 
@@ -393,7 +431,7 @@ class Controller extends BaseController {
 
             foreach ($collection as $resource) {
 
-                $resourceRelationships = $this->document->getResource($resource)->getRelationships($resource);
+                $resourceRelationships = $this->document->getResource($resource)->getRelationships();
 
                 // Set included resources
                 foreach ($resourceRelationships as $relationshipName => $relationshipResourceData) {
@@ -422,6 +460,16 @@ class Controller extends BaseController {
             // Callback
             if (isset($this->config['events']['collection.beforeReturn']) and is_callable($this->config['events']['collection.beforeReturn'])) {
                 call_user_func_array($this->config['events']['collection.beforeReturn'], [$collection, $this->document]);
+            }
+
+            // Set links
+            if ($links) {
+                $this->document->setLinks($links);
+            }
+
+            // Set meta
+            if ($meta) {
+                $this->document->setMeta($meta);
             }
 
             $data = $this->document->toArray();

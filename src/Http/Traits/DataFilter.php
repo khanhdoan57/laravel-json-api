@@ -49,7 +49,14 @@ trait DataFilter {
         return $documentData;
     }
 
-    private final function includeAttributes($data, $resourceType, $attributes)
+    /**
+    * Remove attributes not in "includes" list
+    *
+    * @param array JSON:API data
+    * @param string $resourceType
+    * @param array $attributes
+    */
+    private final function includeAttributes(&$data, $resourceType, $attributes)
     {
         $includeAttributes = function($resource, $resourceType, $attributes) {
 
@@ -88,6 +95,13 @@ trait DataFilter {
         return $data;
     }
 
+    /**
+    * Remove attributes in "excludes" list
+    *
+    * @param array JSON:API data
+    * @param string $resourceType
+    * @param array $attributes
+    */
     private final function excludeAttributes(&$data, $resourceType, $attributes)
     {
         $excludeAttributes = function($resource, $resourceType, $attributes) {

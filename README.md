@@ -407,24 +407,24 @@ class PostResource extends Resource {
 
     protected $type = 'posts';
 
-    public function getId($post)
+    public function getId()
     {
-        return $post->id;
+        return $this->model->id;
     }
 
-    public function getAttributes($post)
+    public function getAttributes()
     {
         return [
-            'title' => $post->title,
-            'content' => $post->content
+            'title' => $this->model->title,
+            'content' => $this->model->content
         ];
     }
 
-    public function getRelationships($post)
+    public function getRelationships()
     {
         return [
-            'author' => $post->user,
-            'comments' => $post->comments
+            'author' => $this->model->user,
+            'comments' => $this->model->comments
         ];
     }
 }
@@ -461,6 +461,80 @@ return [
         ]
     ]
 ];
+```
+
+#### Relationship pagination
+
+In case of "to many" relationships, you may need to paginate the relationship data. For example, a post resource may has hundreds of comments, so we can't show them all in one page. 
+
+Fortunately, we can make it paginated easily using `RelationHandler`. To implement pagination for relationship data, we just need to wrap `Laravel's Relation` in `RelationHandler::handle()` method and call to `paginate()` method.
+
+Example:
+
+```
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+use HackerBoy\LaravelJsonApi\Handlers\RelationHandler;
+
+class Post extends Model
+{
+    public function comments()
+    {
+        return RelationHandler::handle($this->morphMany(Comment::class, 'resource'))->paginate();
+        // If you want to specify the limit number of relationship data per page, simply put an integer as the first param like ->paginate(10)
+    }
+}
+
+```
+
+The post `comments` relationship is now paginated. But we also want to show pagination links in the response document, so we need to add 'links' element to the `comments` relationship data in `PostResource`.
+
+Example:
+
+```
+<?php
+
+namespace App\Http\JsonApiResources;
+
+use HackerBoy\JsonApi\Abstracts\Resource;
+
+class PostResource extends Resource {
+
+    ...
+
+    public function getRelationships()
+    {
+        return [
+            'comments' => [
+                'data' => $this->model->comments,
+                'links' => $this->model->comments()->getJsonApiLinks()
+            ]
+        ];
+    }
+}
+
+```
+
+It's all set now. The default limit value for relationship data is 20 and maximum limit is 100. If you want to change the default value, add these two members to your `/config/laravel_jsonapi.php`:
+
+```
+<?php
+// /config/laravel_jsonapi.php
+
+return [
+    ...
+    'relationship_result_limit' => 20, // Default is 20
+    'relationship_maximum_result_limit' => 100, // Default is 100
+];
+```
+
+API consumers now can fetch the post relationships with `page` and `limit` query params. For example:
+
+```
+GET https://example.com/api/posts/1/relationships/comments?page=1&limit=30
 ```
 
 # Events

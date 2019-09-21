@@ -46,7 +46,7 @@ class Router {
 
                 foreach ($routeData as $key => $value) {
                     
-                    // Route has custom controller actionn
+                    // Route has custom controller action
                     if (in_array($key, $defaultRouteData, true)) {
                         $routes[] = $key;
                         $actions[$key] = $value;

@@ -29,9 +29,6 @@ trait Pagination {
         // Count
         $count = $query->count();
 
-        // Prefix
-        $prefix = @$this->config['prefix'];
-
         // Http query
         $httpQuery = $this->request->query();
 
