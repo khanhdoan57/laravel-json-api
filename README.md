@@ -13,6 +13,7 @@
         - [Sorting](#sorting)
         - [Filter](#filter)
         - [Relationships optimization](#relationships-optimization)
+        - [Relationship pagination](#relationship-pagination)
 - [Events](#events)
     - [Get a resource events](#get-a-resource-events)
     - [Get resource collection events](#get-resource-collection-events)
@@ -20,6 +21,7 @@
     - [Update resource events](#update-resource-events)
     - [Delete resource events](#delete-resource-events)
     - [Relationships events](#relationships-events)
+    - [Relationship pagination](#relationship-pagination)
 - [API Syntax](#api-syntax)
     - [Sorting results](#sorting-results)
     - [Filter and custom query](#filter-and-custom-query)
@@ -463,7 +465,7 @@ return [
 ];
 ```
 
-#### Relationship pagination
+### Relationship pagination
 
 In case of "to many" relationships, you may need to paginate the relationship data. For example, a post resource may has hundreds of comments, so we can't show them all in one page. 
 
@@ -535,6 +537,32 @@ API consumers now can fetch the post relationships with `page` and `limit` query
 
 ```
 GET https://example.com/api/posts/1/relationships/comments?page=1&limit=30
+```
+
+#### Relationship pagination total data count
+
+You can set total data count for the relationship pagination by using method `setCount(int $count)`
+
+For example:
+
+```
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+use HackerBoy\LaravelJsonApi\Handlers\RelationHandler;
+
+class Post extends Model
+{
+    public function comments()
+    {
+        return RelationHandler::handle($this->morphMany(Comment::class, 'resource'))
+                    ->paginate()
+                    ->setCount($this->comment_count);
+    }
+}
+
 ```
 
 # Events

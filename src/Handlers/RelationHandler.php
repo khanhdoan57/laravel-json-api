@@ -166,11 +166,19 @@ class RelationHandler extends Relation {
 	*/
 	public function getCount()
 	{
-		if ($this->count !== null) {
-			return $this->count;
-		}
+		return $this->count;
+	}
 
-		return $this->count = $this->relation->count();
+	/**
+	* Set count
+	*
+	* @param void
+	* @return $this
+	*/
+	public function setCount($count)
+	{
+		$this->count = $count;
+		return $this;
 	}
 
 	/**
@@ -305,15 +313,15 @@ class RelationHandler extends Relation {
 			$links['prev'] = $baseUrl.'?'.http_build_query($prevQuery);
 		}
 
-		// Next link
-		if ($count > $this->getLimit()*static::$currentRelationshipPage) {
+		// Next link - has count or blind increase 1
+		if (($count > $this->getLimit()*static::$currentRelationshipPage) or $count === null) {
 			$nextQuery = $httpQuery;
 			$nextQuery['page'] = static::getCurrentRelationshipPage() + 1;
 			$links['next'] = $baseUrl.'?'.http_build_query($nextQuery);
 		};
 
 		// Last link
-		if ($count > $this->getLimit()*static::$currentRelationshipPage) {
+		if ($count !== null and $count > $this->getLimit()*static::$currentRelationshipPage) {
 
 			$lastPage = $count / $this->getLimit();
 			$lastPageRounded = intval($lastPage);
@@ -343,6 +351,9 @@ class RelationHandler extends Relation {
 	public function paginate($limit = 0, $offset = 0)
 	{
 		$this->isPaginated = true;
+
+		// Counting
+		$this->getCount();
 
 		// Set limit and offset
 		$this->setLimit($limit > 0 ? $limit : null);

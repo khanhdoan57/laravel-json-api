@@ -71,6 +71,11 @@ trait CollectionRelationshipResolver {
                 and ($relationshipObject = $newModel->{$property}()) instanceof Relation
             ) {
 
+                // Check if this is relation handler
+                if ($relationshipObject instanceof \HackerBoy\LaravelJsonApi\Handlers\RelationHandler) {
+                    $relationshipObject = $relationshipObject->getRelation();
+                }
+
                 // Morph to one - go first because it's child class
                 if ($relationshipObject instanceof Relations\MorphTo) {
                     $this->collectionMorphTo($collection, $property, $relationshipObject);
