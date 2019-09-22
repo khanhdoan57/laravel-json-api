@@ -204,7 +204,7 @@ class Controller extends BaseController {
             }
 
             // No results
-            if (!count($relationshipData)) {
+            if (!$relationshipData or (is_countable($relationshipData) and !count($relationshipData))) {
 
                 throw new JsonApiException([
                     'errors' => [

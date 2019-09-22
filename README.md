@@ -486,7 +486,8 @@ class Post extends Model
     public function comments()
     {
         return RelationHandler::handle($this->morphMany(Comment::class, 'resource'))->paginate();
-        // If you want to specify the limit number of relationship data per page, simply put an integer as the first param like ->paginate(10)
+        // If you want to specify the default limit number of relationship data per page
+        // Simply put an integer as the first param like ->paginate(10)
     }
 }
 

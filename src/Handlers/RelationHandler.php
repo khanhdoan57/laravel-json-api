@@ -328,7 +328,7 @@ class RelationHandler extends Relation {
 		};
 
 		// Last link
-		if ($count !== null and $count > $this->getLimit()*static::$currentRelationshipPage) {
+		if ($count !== null) {
 
 			$lastPage = $count / $this->getLimit();
 			$lastPageRounded = intval($lastPage);
