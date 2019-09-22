@@ -124,7 +124,7 @@ class RelationHandler extends Relation {
 	public static function setCustomRelationshipDataLimit($limit)
 	{
 		$limit = intval($limit);
-		$limit = $limit > 1 ? $limit : null;
+		$limit = $limit >= 1 ? $limit : null;
 		static::$customRelationshipDataLimit = $limit;
 	}
 
@@ -286,8 +286,15 @@ class RelationHandler extends Relation {
 		$baseUrl = $document->getUrl($parentResource->getType().'/'.$parent->id.'/relationships/'.$relatedResource->getType());
 
 		// Request instance
-		$request = \Request::instance();
-		$httpQuery = $request->query();
+		$httpQuery = [];
+
+		// Check if using custom limit
+		$defaultLimit = @app()->make('laravel-json-api')->getConfig()['relationship_result_limit'];
+		$defaultLimit = $defaultLimit ?: 20;
+
+		if (intval($this->getLimit()) !== @$defaultLimit) {
+			$httpQuery['limit'] = $this->getLimit();
+		}
 
 		// Pagination links
 		$links = [
@@ -345,10 +352,9 @@ class RelationHandler extends Relation {
 	* Paginate relation
 	*
 	* @param integer $limit
-	* @param integer $offset
 	* @return \Illuminate\Database\Eloquent\Relations\Relation
 	*/
-	public function paginate($limit = 0, $offset = 0)
+	public function paginate($limit = 0)
 	{
 		$this->isPaginated = true;
 
@@ -356,9 +362,10 @@ class RelationHandler extends Relation {
 		$this->getCount();
 
 		// Set limit and offset
-		$this->setLimit($limit > 0 ? $limit : null);
-		$this->setOffset($offset > 0 ? $offset : null);
-
+		if (!static::$customRelationshipDataLimit) {
+			$this->setLimit($limit > 0 ? $limit : null);
+		}
+			
 		$this->relation->take($this->getLimit())->skip($this->getOffset());
 
 		return $this;
