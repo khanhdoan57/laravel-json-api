@@ -2,7 +2,6 @@
 
 namespace HackerBoy\LaravelJsonApi\Http;
 
-use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;

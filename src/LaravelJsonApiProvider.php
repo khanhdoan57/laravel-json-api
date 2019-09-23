@@ -36,6 +36,12 @@ class LaravelJsonApiProvider extends ServiceProvider
         $this->app->singleton('laravel-json-api', function($app) {
             return new LaravelJsonApi(config('laravel_jsonapi'));
         });
+
+        // If lumen
+        if (class_exists('Laravel\Lumen\Application')) {
+            $this->app->configure('jsonapi');
+            $this->app->configure('laravel_jsonapi');
+        }
     }
 
     /**

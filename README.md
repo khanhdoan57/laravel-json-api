@@ -82,6 +82,24 @@ return [
 
 - Ok now we're ready to go, let's try to open http://localhost/api/[RESOURCE_TYPE]
 
+## Lumen installation
+
+For lumen installation, after set up 2 config files above (you may need to create the `/config/` folder by yourself), you have to manually register the package service provider:
+
+```
+<?php
+
+// /bootstrap/app.php
+
+...
+
+// Register service provider
+$app->register(HackerBoy\LaravelJsonApi\LaravelJsonApiProvider::class);
+
+```
+
+Finally, you need to un-comment the middleware `'auth'` in your `bootstrap/app.php`. If not, you must implement [user_resolver](#authorization) in your `laravel_jsonapi.php` config.
+
 # Configuration
 
 All config for this package live in `/config/laravel_jsonapi.php`
