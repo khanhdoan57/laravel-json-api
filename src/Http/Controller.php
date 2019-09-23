@@ -373,8 +373,7 @@ class Controller extends BaseController {
             // Pagination
             list($page, $limit, $skip) = $this->requestPagination();
 
-            if (is_iterable($data) and $data 
-                and (false)) {
+            if (is_iterable($data) and $data) {
                 $collection = $data;
             } else {
 
