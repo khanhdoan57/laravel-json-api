@@ -191,13 +191,22 @@ class Controller extends BaseController {
 
             }
 
-            // Return data as relationship
-            $data = $resourceRelationships[$relationshipName];
-            $relationshipResources = null;
+            // Get data as relation if relationship opimization was set
+            if (isset($this->config['resources'][get_class($resource)]['relationships'][$relationshipName]['property'])) {
+
+                // Get data as relation query
+                $relation = $resource->{$this->config['resources'][get_class($resource)]['relationships'][$relationshipName]['property']}();
+
+                // Sortable
+                $data = $this->sortQuery($relation, get_class($relation->getRelated()))->getResults();
+
+            } else {
+                $data = $resourceRelationships[$relationshipName];
+            }
 
             // Set relationship data
-            if (isset($data['data'])) {
-                $relationshipData = $data['data'];
+            if (isset(((array) $data)['data'])) {
+                $relationshipData = ((array) $data)['data'];
             } else {
                 $relationshipData = $data;
             }
@@ -364,7 +373,8 @@ class Controller extends BaseController {
             // Pagination
             list($page, $limit, $skip) = $this->requestPagination();
 
-            if (is_iterable($data) and $data) {
+            if (is_iterable($data) and $data 
+                and (false)) {
                 $collection = $data;
             } else {
 

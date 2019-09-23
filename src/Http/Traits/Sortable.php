@@ -12,14 +12,16 @@ trait Sortable {
     * @param object Query builder
     * @return object Query builder
     */
-    public function sortQuery($query)
+    public function sortQuery($query, $modelClass = null)
     {
-        if (!isset($this->config['resources'][$this->modelClass]['sortable']) or !is_array($this->config['resources'][$this->modelClass]['sortable'])) {
+        $modelClass = $modelClass ?: $this->modelClass;
+
+        if (!isset($this->config['resources'][$modelClass]['sortable']) or !is_array($this->config['resources'][$modelClass]['sortable'])) {
             return $query;
         }
 
         // Get sortable
-        $sortable = $this->config['resources'][$this->modelClass]['sortable'];
+        $sortable = $this->config['resources'][$modelClass]['sortable'];
 
         // Whitelist
         $whitelistedFields = [];
@@ -41,7 +43,7 @@ trait Sortable {
             $sort = array_filter($sort);
 
             // Check max number of fields
-            $maxFields = @intval($this->config['resources'][$this->modelClass]['max_multiple_sorting']);
+            $maxFields = @intval($this->config['resources'][$modelClass]['max_multiple_sorting']);
             $maxFields = $maxFields > 0 ? $maxFields : 2;
 
             if (count($sort) > $maxFields) {
@@ -55,7 +57,7 @@ trait Sortable {
             }
 
             // Get table name
-            $newModelInstance = new $this->modelClass;
+            $newModelInstance = new $modelClass;
             $tableName = $newModelInstance->getTable();
             unset($newModelInstance);
 

@@ -3,7 +3,14 @@
 namespace HackerBoy\LaravelJsonApi\Handlers;
 
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Traits\ForwardsCalls;
+use Illuminate\Support\Arr;
+use Closure;
 
 class RelationHandler extends Relation {
 
@@ -437,5 +444,165 @@ class RelationHandler extends Relation {
     public function __call($method, $parameters)
     {
         return call_user_func_array([$this->relation, $method], $parameters);
+    }
+
+    /**
+    * {@inheritdoc}
+    */
+    protected function forwardCallTo($object, $method, $parameters)
+    {
+    	return $this->getRelation($object, $method, $parameters);
+    }
+
+	/**
+	* Get the relationship for eager loading.
+	*
+	* @return \Illuminate\Database\Eloquent\Collection
+	*/
+    public function getEager()
+    {
+        return $this->getRelation()->get();
+    }
+
+	/**
+	* Execute the query as a "select" statement.
+	*
+	* @param  array  $columns
+	* @return \Illuminate\Database\Eloquent\Collection
+	*/
+    public function get($columns = ['*'])
+    {
+        return $this->getRelation()->get($columns);
+    }
+
+    /**
+	* Touch all of the related models for the relationship.
+	*
+	* @return void
+	*/
+    public function touch()
+    {
+        $this->getRelation()->touch();
+    }
+
+    /**
+     * Run a raw update against the base query.
+     *
+     * @param  array  $attributes
+     * @return int
+     */
+    public function rawUpdate(array $attributes = [])
+    {
+        return $this->getRelation()->rawUpdate($attributes);
+    }
+
+    /**
+	* {@inheritdoc}
+	*/
+    public function getRelationExistenceCountQuery(Builder $query, Builder $parentQuery)
+    {
+        return $this->getRelation()->getRelationExistenceCountQuery($query, $parentQuery);
+    }
+
+    /**
+	* {@inheritdoc}
+	*/
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
+    {
+        return $this->getRelation()->getRelationExistenceQuery($query, $parentQuery, $columns);
+    }
+
+    /**
+    * {@inheritdoc}
+    */
+    protected function getKeys(array $models, $key = null)
+    {
+        return $this->getRelation()->getKeys($models, $key);
+    }
+
+	/**
+	* {@inheritdoc}
+	*/
+    public function getQuery()
+    {
+        return $this->getRelation()->getQuery();
+    }
+
+	/**
+	* Get the base query builder driving the Eloquent builder.
+	*
+	* @return \Illuminate\Database\Query\Builder
+	*/
+    public function getBaseQuery()
+    {
+        return $this->getRelation()->getBaseQuery();
+    }
+
+	/**
+	* Get the parent model of the relation.
+	*
+	* @return \Illuminate\Database\Eloquent\Model
+	*/
+    public function getParent()
+    {
+        return $this->getRelation()->getParent();
+    }
+
+    /**
+     * Get the fully qualified parent key name.
+     *
+     * @return string
+     */
+    public function getQualifiedParentKeyName()
+    {
+        return $this->getRelation()->getQualifiedParentKeyName();
+    }
+
+    /**
+     * Get the related model of the relation.
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function getRelated()
+    {
+        return $this->getRelation()->getRelated();
+    }
+
+    /**
+     * Get the name of the "created at" column.
+     *
+     * @return string
+     */
+    public function createdAt()
+    {
+        return $this->getRelation()->createdAt();
+    }
+
+    /**
+     * Get the name of the "updated at" column.
+     *
+     * @return string
+     */
+    public function updatedAt()
+    {
+        return $this->getRelation()->updatedAt();
+    }
+
+    /**
+     * Get the name of the related model's "updated at" column.
+     *
+     * @return string
+     */
+    public function relatedUpdatedAt()
+    {
+        return $this->getRelation()->relatedUpdatedAt();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function whereInMethod(Model $model, $key)
+    {
+        return $this->getRelation()->whereInMethod($model, $key);
     }
 }

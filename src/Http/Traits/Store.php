@@ -464,7 +464,8 @@ trait Store {
         $relatedType = Helper\JsonApi::getResourceTypeByModelClass($relatedClass);
 
         $morphMap = $relationshipObject->morphMap();
-        $morphToType = $parentClass;
+
+        $morphToType = ($relationshipObject instanceof Relations\MorphToMany) ? $relationshipObject->getMorphClass() : $parentClass;
 
         if (isset($morphMap[$morphToType])) {
             $morphToType = $morphMap[$morphToType];
