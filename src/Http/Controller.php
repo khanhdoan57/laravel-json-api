@@ -198,7 +198,12 @@ class Controller extends BaseController {
                 $relation = $resource->{$this->config['resources'][get_class($resource)]['relationships'][$relationshipName]['property']}();
 
                 // Sortable
-                $data = $this->sortQuery($relation, get_class($relation->getRelated()))->getResults();
+                $data = [];
+                $data['data'] = $this->sortQuery($relation, get_class($relation->getRelated()))->getResults();
+
+                if ($relation instanceof RelationHandler) {
+                    $data['links'] = $relation->getJsonApiLinks();
+                }
 
             } else {
                 $data = $resourceRelationships[$relationshipName];
