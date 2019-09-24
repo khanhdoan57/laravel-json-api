@@ -50,15 +50,11 @@ trait Pagination {
         $calculatePage = $calculatePage > 1 ? $calculatePage : 1;
         $calculatePageRounded = intval($calculatePage);
         $calculatePage = ($calculatePage > $calculatePageRounded) ? $calculatePageRounded+1 : $calculatePageRounded;
-        $lastLinkQuery = $httpQuery;
-        $lastLinkQuery['page'] = $calculatePage;
-
-        if ($calculatePage > $page) {
-            $lastLink = $baseLink.'?'.http_build_query($lastLinkQuery);
-        }
         
         // Self link
-        $selfLink = $baseLink.(count($httpQuery) ? '?'.http_build_query($httpQuery) : '');
+        $selfLinkQuery = $httpQuery;
+        $selfLinkQuery['page'] = $page;
+        $selfLink = $baseLink.'?'.http_build_query($selfLinkQuery);
 
         // Create pagination
         $pagination = [
@@ -71,9 +67,10 @@ trait Pagination {
         }
 
         // If has last link
-        if (isset($lastLink)) {
-            $pagination['last'] = $lastLink;
-        }
+        $lastLinkQuery = $httpQuery;
+        $lastLinkQuery['page'] = $calculatePage;
+        $lastLink = $baseLink.'?'.http_build_query($lastLinkQuery);
+        $pagination['last'] = $lastLink;
 
         // Prev link
         if ($page > 1) {

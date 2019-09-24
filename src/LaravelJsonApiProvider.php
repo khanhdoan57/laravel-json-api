@@ -43,8 +43,10 @@ class LaravelJsonApiProvider extends ServiceProvider
             // Enable facades
             $this->app->withFacades();
 
-            // Enable eloquent
-            $this->app->withEloquent();
+            // Require eloquent
+            if (!$this->app->bound('db')) {
+                throw new \Exception('Eloquent is required. Please uncomment $app->withEloquent() in bootstrap/app.php');
+            }
 
             // Import config
             $this->app->configure('jsonapi');
