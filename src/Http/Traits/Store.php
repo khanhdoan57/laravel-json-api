@@ -178,10 +178,10 @@ trait Store {
                 }
                 
                 // Auto handler
-                if (isset($this->config['resources'][$modelClass]['relationships'][$relationshipName]['property'])
-                    and $property = $this->config['resources'][$modelClass]['relationships'][$relationshipName]['property']
-                    and method_exists($modelClass, $property)
-                    and (($relationshipObject = $resourceModel->{$property}()) instanceof Relation)
+                if (isset($this->config['resources'][$modelClass]['relationships'][$relationshipName]['relation'])
+                    and $relation = $this->config['resources'][$modelClass]['relationships'][$relationshipName]['relation']
+                    and method_exists($modelClass, $relation)
+                    and (($relationshipObject = $resourceModel->{$relation}()) instanceof Relation)
                 ) {
 
                     // Check if this is relation handler

@@ -466,13 +466,13 @@ return [
 
                 // Declare "author" relationships
                 'author' => [
-                    'property' => 'user', // Property name of Post model to get relationship resources.
+                    'relation' => 'user', // Method name of Post model to get relationship resources.
                     'write' => true, // Optional config, true: Allow "write/delete" requests for this relationship, false: disable write/delete requests for this relationship. Default: true
                 ],
 
                 // Declare "comments" relationships
                 'comments' => [
-                    'property' => 'comments',
+                    'relation' => 'comments',
                     'included' => ['get', 'collection', 'getRelationships', ...], // Optional config, define which routes will include "comments" resources
                     'write' => function($request, $modelObject, $relationshipData) {}, // You can also define a custom handler for relationship write requests.
                     'use_observers' => true, // Using observers while saving relationship objects. Default: true (If you are using auto write handler)

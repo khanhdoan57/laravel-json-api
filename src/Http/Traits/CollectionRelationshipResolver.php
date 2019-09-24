@@ -51,8 +51,8 @@ trait CollectionRelationshipResolver {
 
             foreach ($this->config['resources'][$modelClass]['relationships'] as $relationshipData) {
                 
-                if (isset($relationshipData['property'])) {
-                    $newModel->{$relationshipData['property']} = null;
+                if (isset($relationshipData['relation'])) {
+                    $newModel->{$relationshipData['relation']} = null;
                 }
 
             }
@@ -65,10 +65,10 @@ trait CollectionRelationshipResolver {
         foreach ($relationshipNames as $relationshipName) {
 
             // If relationship name is defined in optimization config
-            if (isset($this->config['resources'][$modelClass]['relationships'][$relationshipName]['property'])
-                and $property = $this->config['resources'][$modelClass]['relationships'][$relationshipName]['property']
-                and method_exists($modelClass, $property)
-                and ($relationshipObject = $newModel->{$property}()) instanceof Relation
+            if (isset($this->config['resources'][$modelClass]['relationships'][$relationshipName]['relation'])
+                and $relation = $this->config['resources'][$modelClass]['relationships'][$relationshipName]['relation']
+                and method_exists($modelClass, $relation)
+                and ($relationshipObject = $newModel->{$relation}()) instanceof Relation
             ) {
 
                 // Check if this is relation handler
@@ -78,61 +78,61 @@ trait CollectionRelationshipResolver {
 
                 // Morph to one - go first because it's child class
                 if ($relationshipObject instanceof Relations\MorphTo) {
-                    $this->collectionMorphTo($collection, $property, $relationshipObject);
+                    $this->collectionMorphTo($collection, $relation, $relationshipObject);
                     continue;
                 }
 
                 // Morph to many
                 if ($relationshipObject instanceof Relations\MorphToMany) {
-                    $this->collectionMorphToMany($collection, $property, $relationshipObject);
+                    $this->collectionMorphToMany($collection, $relation, $relationshipObject);
                     continue;
                 }
 
                 // Morph one
                 if ($relationshipObject instanceof Relations\MorphOne) {
-                    $this->collectionMorphOneOrMany($collection, $property, $relationshipObject);
+                    $this->collectionMorphOneOrMany($collection, $relation, $relationshipObject);
                     continue;
                 }
 
                 // Morph many
                 if ($relationshipObject instanceof Relations\MorphMany) {
-                    $this->collectionMorphOneOrMany($collection, $property, $relationshipObject, true);
+                    $this->collectionMorphOneOrMany($collection, $relation, $relationshipObject, true);
                     continue;
                 }
 
                 // Has one
                 if ($relationshipObject instanceof Relations\HasOne) {
-                    $this->collectionHasOne($collection, $property, $relationshipObject);
+                    $this->collectionHasOne($collection, $relation, $relationshipObject);
                     continue;
                 }
 
                 // Has many
                 if ($relationshipObject instanceof Relations\HasMany) {
-                    $this->collectionHasMany($collection, $property, $relationshipObject);
+                    $this->collectionHasMany($collection, $relation, $relationshipObject);
                     continue;
                 }
 
                 // Belongs to one
                 if ($relationshipObject instanceof Relations\BelongsTo) {
-                    $this->collectionBelongsTo($collection, $property, $relationshipObject);
+                    $this->collectionBelongsTo($collection, $relation, $relationshipObject);
                     continue;
                 }
 
                 // Belongs to many
                 if ($relationshipObject instanceof Relations\BelongsToMany) {
-                    $this->collectionBelongsToMany($collection, $property, $relationshipObject);
+                    $this->collectionBelongsToMany($collection, $relation, $relationshipObject);
                     continue;
                 }
 
                 // Has one through
                 if ($relationshipObject instanceof Relations\HasOneThrough) {
-                    $this->collectionHasOneThrough($collection, $property, $relationshipObject, $newModel);
+                    $this->collectionHasOneThrough($collection, $relation, $relationshipObject, $newModel);
                     continue;
                 }
 
                 // Has many through
                 if ($relationshipObject instanceof Relations\HasManyThrough) {
-                    $this->collectionHasManyThrough($collection, $property, $relationshipObject, $newModel);
+                    $this->collectionHasManyThrough($collection, $relation, $relationshipObject, $newModel);
                     continue;
                 }
 
@@ -147,7 +147,7 @@ trait CollectionRelationshipResolver {
     /**
     * Optimize morphTo relationship
     */
-    protected function collectionMorphTo($collection, $property, $relationshipObject)
+    protected function collectionMorphTo($collection, $relation, $relationshipObject)
     {
         $morphMap = $relationshipObject->morphMap();
 
@@ -158,7 +158,7 @@ trait CollectionRelationshipResolver {
 
             // Type is null
             if (!$resource->{$relationshipObject->getMorphType()}) {
-                $resource->{$property} = null;
+                $resource->{$relation} = null;
                 continue;
             }
 
@@ -194,7 +194,7 @@ trait CollectionRelationshipResolver {
 
             // Attach to resource
             foreach ($resourceGroup as $resource) {
-                $resource->{$property} = $morphToResources->where($morphToResourceKeyName, $resource->{$relationshipObject->getForeignKeyName()})->first();
+                $resource->{$relation} = $morphToResources->where($morphToResourceKeyName, $resource->{$relationshipObject->getForeignKeyName()})->first();
             }
         }
     }
@@ -202,7 +202,7 @@ trait CollectionRelationshipResolver {
     /**
     * Optimize morphToMany relationship
     */
-    protected function collectionMorphToMany($collection, $property, $relationshipObject)
+    protected function collectionMorphToMany($collection, $relation, $relationshipObject)
     {
         $relationshipQuery = $this->getQuery($relationshipObject);
         
@@ -231,7 +231,7 @@ trait CollectionRelationshipResolver {
 
             }
 
-            $resource->{$property} = collect($relatedResources);
+            $resource->{$relation} = collect($relatedResources);
         }
 
     }
@@ -239,7 +239,7 @@ trait CollectionRelationshipResolver {
     /**
     * Optimize morphOne relationship
     */
-    protected function collectionMorphOneOrMany($collection, $property, $relationshipObject, $isMany = false)
+    protected function collectionMorphOneOrMany($collection, $relation, $relationshipObject, $isMany = false)
     {
         $relationshipQuery = $this->getQuery($relationshipObject);
 
@@ -264,14 +264,14 @@ trait CollectionRelationshipResolver {
                 $related = $related->first();
             }
 
-            $resource->{$property} = $related;
+            $resource->{$relation} = $related;
         }
     }
 
     /**
     * Optimize hasOne relationship
     */
-    protected function collectionHasOne($collection, $property, $relationshipObject)
+    protected function collectionHasOne($collection, $relation, $relationshipObject)
     {
         $relationshipQuery = $this->getQuery($relationshipObject);
 
@@ -287,16 +287,16 @@ trait CollectionRelationshipResolver {
 
         $results = $relationshipObject->get();
 
-        // Attach result to resource property
+        // Attach result to resource relation
         foreach ($collection as $resource) {
-            $resource->{$property} = $results->where($relationshipObject->getForeignKeyName(), $resource->{$relationshipObject->getParent()->getKeyName()})->first();
+            $resource->{$relation} = $results->where($relationshipObject->getForeignKeyName(), $resource->{$relationshipObject->getParent()->getKeyName()})->first();
         }
     }
 
     /**
     * Optimize hasMany relationship
     */
-    protected function collectionHasMany($collection, $property, $relationshipObject)
+    protected function collectionHasMany($collection, $relation, $relationshipObject)
     {
         $relationshipQuery = $this->getQuery($relationshipObject);
 
@@ -311,16 +311,16 @@ trait CollectionRelationshipResolver {
 
         $results = $relationshipObject->get();
 
-        // Attach result to resource property
+        // Attach result to resource relation
         foreach ($collection as $resource) {
-            $resource->{$property} = $results->where($relationshipObject->getForeignKeyName(), $resource->{$relationshipObject->getParent()->getKeyName()});
+            $resource->{$relation} = $results->where($relationshipObject->getForeignKeyName(), $resource->{$relationshipObject->getParent()->getKeyName()});
         }
     }
 
     /**
     * Optimize belongsTo relationship
     */
-    protected function collectionBelongsTo($collection, $property, $relationshipObject)
+    protected function collectionBelongsTo($collection, $relation, $relationshipObject)
     {
         $relationshipQuery = $this->getQuery($relationshipObject);
 
@@ -336,16 +336,16 @@ trait CollectionRelationshipResolver {
         // Get results
         $results = $relationshipObject->get();
 
-        // Attach result to resource property
+        // Attach result to resource relation
         foreach ($collection as $resource) {
-            $resource->{$property} = $results->where($relationshipObject->getOwnerKeyName(), $resource->{$relationshipObject->getForeignKeyName()})->first();
+            $resource->{$relation} = $results->where($relationshipObject->getOwnerKeyName(), $resource->{$relationshipObject->getForeignKeyName()})->first();
         }
     }
 
     /**
     * Optimize belongsToMany relationships
     */
-    protected function collectionBelongsToMany($collection, $property, $relationshipObject)
+    protected function collectionBelongsToMany($collection, $relation, $relationshipObject)
     {
         $relationshipQuery = $this->getQuery($relationshipObject);
 
@@ -360,7 +360,7 @@ trait CollectionRelationshipResolver {
         // Get results
         $results = $relationshipObject->get();
 
-        // Attach result to resource property
+        // Attach result to resource relation
         $resultsById = [];
         $pivot = $relationshipObject->getPivotAccessor();
         foreach ($results as $related) {
@@ -374,15 +374,15 @@ trait CollectionRelationshipResolver {
         }
 
         foreach ($collection as $resource) {
-            $resource->{$property} = isset($resultsById[$resource->{$resource->getKeyName()}]) ? $resultsById[$resource->{$resource->getKeyName()}] : [];
-            $resource->{$property} = collect($resource->{$property});
+            $resource->{$relation} = isset($resultsById[$resource->{$resource->getKeyName()}]) ? $resultsById[$resource->{$resource->getKeyName()}] : [];
+            $resource->{$relation} = collect($resource->{$relation});
         }
     }
 
     /**
     * Optimize hasOneThrough relationships
     */
-    protected function collectionHasOneThrough($collection, $property, $relationshipObject, $newModel)
+    protected function collectionHasOneThrough($collection, $relation, $relationshipObject, $newModel)
     {
         $relationshipQuery = $this->getQuery($relationshipObject);
 
@@ -396,9 +396,9 @@ trait CollectionRelationshipResolver {
 
         $results = $relationshipObject->get();
 
-        // Attach result to resource property
+        // Attach result to resource relation
         foreach ($collection as $resource) {
-            $resource->{$property} = $results->where('laravel_through_key', $resource->{$resource->getKeyName()})->first();
+            $resource->{$relation} = $results->where('laravel_through_key', $resource->{$resource->getKeyName()})->first();
         }
 
     }
@@ -406,7 +406,7 @@ trait CollectionRelationshipResolver {
     /**
     * Optimize hasManyThrough relationships
     */
-    protected function collectionHasManyThrough($collection, $property, $relationshipObject, $newModel)
+    protected function collectionHasManyThrough($collection, $relation, $relationshipObject, $newModel)
     {
         $relationshipQuery = $this->getQuery($relationshipObject);
 
@@ -420,9 +420,9 @@ trait CollectionRelationshipResolver {
 
         $results = $relationshipObject->get();
 
-        // Attach result to resource property
+        // Attach result to resource relation
         foreach ($collection as $resource) {
-            $resource->{$property} = $results->where('laravel_through_key', $resource->{$resource->getKeyName()});
+            $resource->{$relation} = $results->where('laravel_through_key', $resource->{$resource->getKeyName()});
         }
 
     }

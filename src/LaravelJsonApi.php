@@ -112,7 +112,7 @@ class LaravelJsonApi {
     *            // Relationship optimization
     *            'relationships' => [
     *                'relationship_name' => [
-    *                    'property' => 'property name', // Recommended - for query optimization
+    *                    'relation' => 'relation method name', // Recommended - for query optimization
     *                    'included' => ['get', 'collection'] // Define included in which method, default will be all,
     *                    'write' => function($resourceModel, $relationshipData) {}, // True for auto handle Or false to turn it off
     *                    'use_observers' => true, // Default is true. Use observers for relationships write (when using auto handler)

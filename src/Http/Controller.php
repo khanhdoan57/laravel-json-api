@@ -192,10 +192,10 @@ class Controller extends BaseController {
             }
 
             // Get data as relation if relationship opimization was set
-            if (isset($this->config['resources'][get_class($resource)]['relationships'][$relationshipName]['property'])) {
+            if (isset($this->config['resources'][get_class($resource)]['relationships'][$relationshipName]['relation'])) {
 
                 // Get data as relation query
-                $relation = $resource->{$this->config['resources'][get_class($resource)]['relationships'][$relationshipName]['property']}();
+                $relation = $resource->{$this->config['resources'][get_class($resource)]['relationships'][$relationshipName]['relation']}();
 
                 // Sortable
                 $data = [];

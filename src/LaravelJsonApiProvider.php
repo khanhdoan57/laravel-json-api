@@ -39,6 +39,14 @@ class LaravelJsonApiProvider extends ServiceProvider
 
         // If lumen
         if (class_exists('Laravel\Lumen\Application')) {
+
+            // Enable facades
+            $this->app->withFacades();
+
+            // Enable eloquent
+            $this->app->withEloquent();
+
+            // Import config
             $this->app->configure('jsonapi');
             $this->app->configure('laravel_jsonapi');
         }
