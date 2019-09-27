@@ -50,7 +50,7 @@ trait Pagination {
         $calculatePage = $calculatePage > 1 ? $calculatePage : 1;
         $calculatePageRounded = intval($calculatePage);
         $calculatePage = ($calculatePage > $calculatePageRounded) ? $calculatePageRounded+1 : $calculatePageRounded;
-        
+
         // Self link
         $selfLinkQuery = $httpQuery;
         $selfLinkQuery['page'] = $page;
@@ -82,7 +82,7 @@ trait Pagination {
 
         // Next link
         if ($page < $calculatePage) {
-            
+
             $nextLinkQuery = $httpQuery;
 
             if (!isset($nextLinkQuery['page'])) {
@@ -92,6 +92,10 @@ trait Pagination {
             $nextLinkQuery['page']++;
             $nextLink = $baseLink.'?'.http_build_query($nextLinkQuery);
             $pagination['next'] = $nextLink;
+        }
+
+        foreach ($pagination as $key => $value) {
+            $pagination[$key] = urldecode($value);
         }
 
         $pagination = $this->document->makePagination($pagination);
