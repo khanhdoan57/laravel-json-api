@@ -616,6 +616,7 @@ Param | type | Description
 ------|------|------------
 $modelClass | string | Model class name
 $query | object | Laravel query object
+$controller | object | Current controller
 
 ### get.beforeReturn
 
@@ -623,6 +624,7 @@ Param | type | Description
 ------|------|------------
 $modelObject | object | Laravel Eloquent model object
 $document | object | HackerBoy\JsonApi\Document object
+$controller | object | Current controller
 
 ## Get resource collection events
 
@@ -636,6 +638,7 @@ Param | type | Description
 ------|------|------------
 $modelClass | string | Model class name
 $query | object | Laravel query object
+$controller | object | Current controller
 
 ### collection.afterQuery
 
@@ -644,6 +647,7 @@ This event will be triggered after the get query is executed.
 Param | type | Description
 ------|------|------------
 $collection | object | Laravel Collection of model objects
+$controller | object | Current controller
 
 ### collection.beforeReturn
 
@@ -651,6 +655,7 @@ Param | type | Description
 ------|------|------------
 $collection | object | Laravel Collection of model objects
 $document | object | HackerBoy\JsonApi\Document object
+$controller | object | Current controller
 
 ## Create resource events
 
@@ -661,6 +666,7 @@ This event will be triggered before the save query is executed.
 Param | type | Description
 ------|------|------------
 $model | object | Laravel model object
+$controller | object | Current controller
 
 ### post.saved
 
@@ -669,6 +675,7 @@ This event will be triggered after the save query is executed.
 Param | type | Description
 ------|------|------------
 $model | object | Laravel model object
+$controller | object | Current controller
 
 ## Update resource events
 
@@ -680,6 +687,7 @@ Param | type | Description
 ------|------|------------
 $modelClass | string | Model class name
 $query | object | Laravel database query object
+$controller | object | Current controller
 
 ### patch.saving
 
@@ -688,6 +696,7 @@ This event will be triggered before the save query is executed.
 Param | type | Description
 ------|------|------------
 $model | object | Laravel model object
+$controller | object | Current controller
 
 ### patch.saved
 
@@ -696,6 +705,7 @@ This event will be triggered after the save query is executed.
 Param | type | Description
 ------|------|------------
 $model | object | Laravel model object
+$controller | object | Current controller
 
 ## Delete resource events
 
@@ -707,6 +717,7 @@ Param | type | Description
 ------|------|------------
 $modelClass | string | Model class name
 $query | object | Laravel database query object
+$controller | object | Current controller
 
 ### delete.deleting
 
@@ -715,6 +726,7 @@ This event will be triggered before the delete query is executed.
 Param | type | Description
 ------|------|------------
 $model | object | Laravel model object
+$controller | object | Current controller
 
 ### delete.deleted
 
@@ -723,6 +735,7 @@ This event will be triggered after the delete query is executed.
 Param | type | Description
 ------|------|------------
 $model | object | Laravel model object
+$controller | object | Current controller
 
 ### delete.beforeReturn
 
@@ -732,6 +745,7 @@ Param | type | Description
 ------|------|------------
 $model | object | Laravel model object
 $document | object | HackerBoy\JsonApi\Document object
+$controller | object | Current controller
 
 ## Relationships events
 
@@ -744,6 +758,7 @@ Param | type | Description
 $model | object | Laravel model object
 $relationshipName | string | Relationship name
 $document | object | HackerBoy\JsonApi\Document object
+$controller | object | Current controller
 
 ### relationships.saving
 
@@ -754,7 +769,7 @@ Param | type | Description
 $model | object | Laravel model object
 $relationshipName | string | Relationship name
 $relationshipData | array | The relationship data
-
+$controller | object | Current controller
 
 ### relationships.saving
 
@@ -765,6 +780,7 @@ Param | type | Description
 $model | object | Laravel model object
 $relationshipName | string | Relationship name
 $relationshipData | array | The relationship data
+$controller | object | Current controller
 
 # API Syntax
 ## Sorting results

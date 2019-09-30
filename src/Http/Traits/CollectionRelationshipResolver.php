@@ -13,7 +13,7 @@ trait CollectionRelationshipResolver {
     /**
     * Resolve relationships of a mixed collection
     */
-    protected function resolveMixedCollectionRelationships($collection)
+    public function resolveMixedCollectionRelationships($collection)
     {
         $collectionByType = [];
 
@@ -41,7 +41,7 @@ trait CollectionRelationshipResolver {
     /**
     * Resolve relationships of a collection
     */
-    protected function resolveCollectionRelationships($modelClass, $collection)
+    public function resolveCollectionRelationships($modelClass, $collection)
     {
         // Get relationship data
         $newModel = new $modelClass;

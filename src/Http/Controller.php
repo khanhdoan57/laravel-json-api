@@ -52,7 +52,7 @@ class Controller extends BaseController {
 
                 // Callback
                 if (isset($this->config['events']['get.query']) and is_callable($this->config['events']['get.query'])) {
-                    call_user_func_array($this->config['events']['get.query'], [$this->modelClass, $query]);
+                    call_user_func_array($this->config['events']['get.query'], [$this->modelClass, $query, $this]);
                 }
 
                 $resource = $query->first();
@@ -118,7 +118,7 @@ class Controller extends BaseController {
 
             // Callback
             if (isset($this->config['events']['get.beforeReturn']) and is_callable($this->config['events']['get.beforeReturn'])) {
-                call_user_func_array($this->config['events']['get.beforeReturn'], [$resource, $this->document]);
+                call_user_func_array($this->config['events']['get.beforeReturn'], [$resource, $this->document, $this]);
             }
 
             $data = $this->document->toArray();
@@ -150,7 +150,7 @@ class Controller extends BaseController {
 
                 // Callback
                 if (isset($this->config['events']['get.query']) and is_callable($this->config['events']['get.query'])) {
-                    call_user_func_array($this->config['events']['get.query'], [$this->modelClass, $query]);
+                    call_user_func_array($this->config['events']['get.query'], [$this->modelClass, $query, $this]);
                 }
 
                 $resource = $query->first();
@@ -292,7 +292,7 @@ class Controller extends BaseController {
 
             // Callback
             if (isset($this->config['events']['relationships.beforeReturn']) and is_callable($this->config['events']['relationships.beforeReturn'])) {
-                call_user_func_array($this->config['events']['relationships.beforeReturn'], [$resource, $relationshipName, $this->document]);
+                call_user_func_array($this->config['events']['relationships.beforeReturn'], [$resource, $relationshipName, $this->document, $this]);
             }
             
             return response()->json($this->document);
@@ -318,7 +318,7 @@ class Controller extends BaseController {
 
             // Callback
             if (isset($this->config['events']['get.query']) and is_callable($this->config['events']['get.query'])) {
-                call_user_func_array($this->config['events']['get.query'], [$this->modelClass, $query]);
+                call_user_func_array($this->config['events']['get.query'], [$this->modelClass, $query, $this]);
             }
 
             $resource = $query->first();
@@ -387,7 +387,7 @@ class Controller extends BaseController {
 
                 // Callback
                 if (isset($this->config['events']['collection.query']) and is_callable($this->config['events']['collection.query'])) {
-                    call_user_func_array($this->config['events']['collection.query'], [$this->modelClass, $query]);
+                    call_user_func_array($this->config['events']['collection.query'], [$this->modelClass, $query, $this]);
                 }
 
                 // Filter
@@ -416,7 +416,7 @@ class Controller extends BaseController {
 
                 // Callback
                 if (isset($this->config['events']['collection.afterQuery']) and is_callable($this->config['events']['collection.afterQuery'])) {
-                    call_user_func($this->config['events']['collection.afterQuery'], $collection);
+                    call_user_func_array($this->config['events']['collection.afterQuery'], [$collection, $this]);
                 }
 
                 if (!$collection->count()) {
@@ -472,7 +472,7 @@ class Controller extends BaseController {
 
             // Callback
             if (isset($this->config['events']['collection.beforeReturn']) and is_callable($this->config['events']['collection.beforeReturn'])) {
-                call_user_func_array($this->config['events']['collection.beforeReturn'], [$collection, $this->document]);
+                call_user_func_array($this->config['events']['collection.beforeReturn'], [$collection, $this->document, $this]);
             }
 
             // Set links
@@ -524,7 +524,7 @@ class Controller extends BaseController {
 
             // Callback
             if (isset($this->config['events']['patch.query']) and is_callable($this->config['events']['patch.query'])) {
-                call_user_func_array($this->config['events']['patch.query'], [$this->modelClass, $query]);
+                call_user_func_array($this->config['events']['patch.query'], [$this->modelClass, $query, $this]);
             }
 
             $resourceModel = $query->first();
@@ -561,7 +561,7 @@ class Controller extends BaseController {
 
             // Callback
             if (isset($this->config['events']['delete.query']) and is_callable($this->config['events']['delete.query'])) {
-                call_user_func_array($this->config['events']['delete.query'], [$this->modelClass, $query]);
+                call_user_func_array($this->config['events']['delete.query'], [$this->modelClass, $query, $this]);
             }
 
             $resourceModel = $query->first();
@@ -571,14 +571,14 @@ class Controller extends BaseController {
 
             // Callback
             if (isset($this->config['events']['delete.deleting']) and is_callable($this->config['events']['delete.deleting'])) {
-                call_user_func($this->config['events']['delete.deleting'], $resourceModel);
+                call_user_func_array($this->config['events']['delete.deleting'], [$resourceModel, $this]);
             }
 
             $resourceModel->delete();
 
             // Callback
             if (isset($this->config['events']['delete.deleted']) and is_callable($this->config['events']['delete.deleted'])) {
-                call_user_func($this->config['events']['delete.deleted'], $resourceModel);
+                call_user_func_array($this->config['events']['delete.deleted'], [$resourceModel, $this]);
             }
 
             $this->document->setMeta([
@@ -587,7 +587,7 @@ class Controller extends BaseController {
 
             // Callback
             if (isset($this->config['events']['delete.beforeReturn']) and is_callable($this->config['events']['delete.beforeReturn'])) {
-                call_user_func_array($this->config['events']['delete.beforeReturn'], [$resourceModel, $this->document]);
+                call_user_func_array($this->config['events']['delete.beforeReturn'], [$resourceModel, $this->document, $this]);
             }
 
             return response()->json($this->document);
