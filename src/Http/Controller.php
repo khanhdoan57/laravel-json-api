@@ -150,7 +150,7 @@ class Controller extends BaseController {
 
                 // Callback
                 if (isset($this->config['events']['get.query']) and is_callable($this->config['events']['get.query'])) {
-                    call_user_func_array($this->config['events']['get.query'], [$this->modelClass, $query, $this]);
+                    call_user_func_array($this->config['events']['get.query'], [$id, $this->modelClass, $query, $this]);
                 }
 
                 $resource = $query->first();
