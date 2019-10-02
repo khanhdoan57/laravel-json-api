@@ -385,11 +385,6 @@ class Controller extends BaseController {
                 // Make query
                 $query = $this->modelClass::query();
 
-                // Callback
-                if (isset($this->config['events']['collection.query']) and is_callable($this->config['events']['collection.query'])) {
-                    call_user_func_array($this->config['events']['collection.query'], [$this->modelClass, $query, $this]);
-                }
-
                 // Filter
                 if ($filter = $this->request->query('filter') and is_array($filter)) {
 
@@ -407,6 +402,11 @@ class Controller extends BaseController {
 
                 } elseif ($queryData = $this->request->query('_query') and $queryData = json_decode(urldecode($queryData), true) and is_array($queryData)) {
                     $this->queryComposer($queryData, $query);
+                }
+
+                // Callback
+                if (isset($this->config['events']['collection.query']) and is_callable($this->config['events']['collection.query'])) {
+                    call_user_func_array($this->config['events']['collection.query'], [$this->modelClass, $query, $this]);
                 }
 
                 $collection = $this->sortQuery(clone $query)->take($limit)->skip($skip)->get();
