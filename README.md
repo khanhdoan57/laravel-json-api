@@ -558,6 +558,28 @@ API consumers now can fetch the post relationships with `page` and `limit` query
 GET https://example.com/api/posts/1/relationships/comments?page=1&limit=30
 ```
 
+Important: Relationship using pagination will be disabled on collection page by default due to performance problem. We can't optimize relationship query coming with pagination in a collection. If you still want to enable paginated relationship data on collection page, you can still do it by using `->enableForCollection()` method. For example:
+
+```
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+use HackerBoy\LaravelJsonApi\Handlers\RelationHandler;
+
+class Post extends Model
+{
+    public function comments()
+    {
+        return RelationHandler::handle($this->morphMany(Comment::class, 'resource'))
+                    ->paginate()
+                    ->enableForCollection();
+    }
+}
+
+```
+
 #### Relationship pagination total data count
 
 You can set total data count for the relationship pagination by using method `setCount(int $count)`

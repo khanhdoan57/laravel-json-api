@@ -73,7 +73,28 @@ trait CollectionRelationshipResolver {
 
                 // Check if this is relation handler
                 if ($relationshipObject instanceof \HackerBoy\LaravelJsonApi\Handlers\RelationHandler) {
+
+                    // If disabled
+                    if (!$relationshipObject->showOnCollection()) {
+                        
+                        $relationshipObject = $relationshipObject->getRelation();
+                        $this->collectionDisableRelationships($collection, $relation, 
+                            ($relationshipObject instanceof Relations\MorphToMany
+                            or $relationshipObject instanceof Relations\MorphMany
+                            or $relationshipObject instanceof Relations\HasMany
+                            or $relationshipObject instanceof Relations\BelongsToMany
+                            or $relationshipObject instanceof Relations\HasManyThrough
+                            ) 
+                            ? 'many' : 'one'
+                        );
+                        continue;
+
+                    } elseif ($relationshipObject->isPaginated()) { // Enabled and paginated? Can't optimize
+                        continue;
+                    } 
+
                     $relationshipObject = $relationshipObject->getRelation();
+
                 }
 
                 // Morph to one - go first because it's child class
@@ -425,6 +446,20 @@ trait CollectionRelationshipResolver {
             $resource->{$relation} = $results->where('laravel_through_key', $resource->{$resource->getKeyName()});
         }
 
+    }
+
+    /**
+    * Disable relationships
+    *
+    * @param Collection
+    * @param string
+    * @return void
+    */
+    protected function collectionDisableRelationships($collection, $relation, $type)
+    {
+        foreach ($collection as $resource) {
+            $resource->{$relation} = ($type === 'many') ? [] : null;
+        }
     }
 
     protected function mergeModelDataToArray(&$array, $modelData)

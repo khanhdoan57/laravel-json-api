@@ -15,14 +15,6 @@ use Closure;
 class RelationHandler extends Relation {
 
 	/**
-	* Loaded relations
-	*
-	* @var array
-	* @access protected
-	*/
-	protected static $relations = [];
-
-	/**
 	* Short cut method to init new RelationHandler object
 	*
 	* @param \Illuminate\Database\Eloquent\Relations\Relation
@@ -30,13 +22,7 @@ class RelationHandler extends Relation {
 	*/
 	public static function handle(Relation $relation)
 	{
-		$hash = spl_object_hash($relation);
-
-		if (isset(static::$relations[$hash])) {
-			return static::$relations[$hash];
-		}
-
-		return static::$relations[$hash] = new RelationHandler($relation);
+		return new static($relation);
 	}
 
 	/**
@@ -70,6 +56,14 @@ class RelationHandler extends Relation {
 	* @access protected
 	*/
 	protected $offset = null;
+
+	/**
+	* Execute query for collection
+	* 
+	* @var boolean
+	* @access protected
+	*/
+	protected $showOnCollection = true;
 
 	/**
 	* Current relationship page
@@ -271,6 +265,41 @@ class RelationHandler extends Relation {
 	}
 
 	/**
+	* Show from collection
+	*
+	* @param void
+	* @return $this
+	*/
+	public function enableForCollection()
+	{
+		$this->showOnCollection = true;
+		return $this;
+	}
+
+	/**
+	* Hide from collection
+	*
+	* @param void
+	* @return $this
+	*/
+	public function disableForCollection()
+	{
+		$this->showOnCollection = false;
+		return $this;
+	}
+
+	/**
+	* Check if relation is on collection
+	*
+	* @param void
+	* @return bool $this->showOnCollection
+	*/
+	public function showOnCollection()
+	{
+		return $this->showOnCollection;
+	}
+
+	/**
 	* Get JSON:API links for relationship
 	*
 	* @param void
@@ -363,6 +392,7 @@ class RelationHandler extends Relation {
 	*/
 	public function paginate($limit = 0)
 	{
+		$this->showOnCollection = false;
 		$this->isPaginated = true;
 
 		// Counting
@@ -376,6 +406,17 @@ class RelationHandler extends Relation {
 		$this->relation->take($this->getLimit())->skip($this->getOffset());
 
 		return $this;
+	}
+
+	/**
+	* Check if is paginated
+	*
+	* @param void
+	* @return bool
+	*/
+	public function isPaginated()
+	{
+		return $this->isPaginated;
 	}
 
 	/**
