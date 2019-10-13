@@ -636,6 +636,7 @@ This event will be triggered before the get query is executed.
 
 Param | type | Description
 ------|------|------------
+$id | mixed | Resource ID
 $modelClass | string | Model class name
 $query | object | Laravel query object
 $controller | object | Current controller
