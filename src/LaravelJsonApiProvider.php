@@ -14,6 +14,10 @@ class LaravelJsonApiProvider extends ServiceProvider
      */
     public function boot()
     {
+        if (!config('laravel_jsonapi')) {
+            return;
+        }
+
         $this->routes();
 
         // Custom validation rule
