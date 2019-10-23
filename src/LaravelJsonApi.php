@@ -127,7 +127,7 @@ class LaravelJsonApi {
     public function __construct($config = [])
     {
         if (!isset($config['jsonapi_config'])) {
-            throw new \Exception('jsonapi_config is required');
+            return;
         }
 
         $this->document = new Document(config($config['jsonapi_config']));
