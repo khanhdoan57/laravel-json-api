@@ -59,7 +59,7 @@ class RelationHandler extends Relation {
 
 	/**
 	* Execute query for collection
-	* 
+	*
 	* @var boolean
 	* @access protected
 	*/
@@ -197,7 +197,7 @@ class RelationHandler extends Relation {
 		$this->setLimit(null);
 
 		return $this->limit;
-		
+
 	}
 
 	/**
@@ -215,7 +215,7 @@ class RelationHandler extends Relation {
 		$config = app()->make('laravel-json-api')->getConfig();
 		$limit = (is_integer($limit) and $limit >= 1) ? $limit : (isset($config['relationship_result_limit']) ? $config['relationship_result_limit'] : 20);
 
-		if ((isset($config['relationship_maximum_result_limit']) and $limit > $config['relationship_maximum_result_limit']) 
+		if ((isset($config['relationship_maximum_result_limit']) and $limit > $config['relationship_maximum_result_limit'])
 			or (!isset($config['relationship_maximum_result_limit']) and $limit > 100)) {
 			$limit = 100;
 		}
@@ -306,7 +306,7 @@ class RelationHandler extends Relation {
 	* @return array
 	*/
 	public function getJsonApiLinks()
-	{	
+	{
 		// JSONAPI document
 		$document = app()->make('laravel-json-api')->getDocument();
 
@@ -376,7 +376,7 @@ class RelationHandler extends Relation {
 			}
 
 			$lastQuery = $httpQuery;
-			$lastQuery['page'] = $lastPage;
+			$lastQuery['page'] = $lastPage ?: 1;
 
 			$links['last'] = $baseUrl.'?'.http_build_query($lastQuery);
 		}
@@ -402,7 +402,7 @@ class RelationHandler extends Relation {
 		if (!static::$customRelationshipDataLimit) {
 			$this->setLimit($limit > 0 ? $limit : null);
 		}
-			
+
 		$this->relation->take($this->getLimit())->skip($this->getOffset());
 
 		return $this;
