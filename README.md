@@ -515,7 +515,7 @@ class Post extends Model
 
 ```
 
-The post `comments` relationship is now paginated. But we also want to show pagination links in the response document, so we need to add 'links' element to the `comments` relationship data in `PostResource`.
+The post `comments` relationship is now paginated. But we also want to show pagination links in the response document, so we need to add 'links' element to the `comments` relationship data in `PostResource` using `getJsonApiLinks($relationshipName = null)` method. The first parameter is relationship name (optional - default is resource type).
 
 Example:
 

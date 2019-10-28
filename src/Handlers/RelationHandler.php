@@ -302,10 +302,10 @@ class RelationHandler extends Relation {
 	/**
 	* Get JSON:API links for relationship
 	*
-	* @param void
+	* @param string Relationship name
 	* @return array
 	*/
-	public function getJsonApiLinks()
+	public function getJsonApiLinks($relationshipName = null)
 	{
 		// JSONAPI document
 		$document = app()->make('laravel-json-api')->getDocument();
@@ -319,7 +319,7 @@ class RelationHandler extends Relation {
 		$relatedResource = $document->getResource($related);
 
 		// Base url
-		$baseUrl = $document->getUrl($parentResource->getType().'/'.$parent->id.'/relationships/'.$relatedResource->getType());
+		$baseUrl = $document->getUrl($parentResource->getType().'/'.$parent->id.'/relationships/'.($relationshipName ?: $relatedResource->getType()));
 
 		// Request instance
 		$httpQuery = [];
