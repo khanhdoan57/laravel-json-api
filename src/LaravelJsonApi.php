@@ -103,7 +103,7 @@ class LaravelJsonApi {
     *            ],
     *            
     *            // Override global middleware config
-    *            'middlewares' => [
+    *            'middleware' => [
     *                'get' => ['...'],
     *                'post' => ['...'],
     *                ...
@@ -121,7 +121,7 @@ class LaravelJsonApi {
     *        
     *        ]
     *    ],
-    *    'middlewares' => ['...'] // Global middleware
+    *    'middleware' => ['...'] // Global middleware
     * ];
     */
     public function __construct($config = [])

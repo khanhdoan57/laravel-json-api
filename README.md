@@ -2,12 +2,12 @@
 # Table of Contents
 - [Installation](#installation)
 - [Configuration](#configuration)
-    - [Global Middlewares](#global-middlewares)
+    - [Global Middleware](#global-middleware)
     - [Authorization](#authorization)
     - [Resource config](#resource-config)
         - [Routes](#routes)
         - [Route configuration](#route-configuration)
-        - [Resource middlewares](#resource-middlewares)
+        - [Resource middleware](#resource-middleware)
         - [Fillable fields](#fillable-fields)
         - [Validation](#validation)
         - [Sorting](#sorting)
@@ -104,13 +104,13 @@ Finally, you need to un-comment the middleware `'auth'` in your `bootstrap/app.p
 
 All config for this package live in `/config/laravel_jsonapi.php`
 
-## Global Middlewares
+## Global Middleware
 
-Set middlewares for all API methods
+Set middleware for all API methods
 
 Config key | Type | Default | Required | Description
 -----------|------|---------|----------|------------
-middlewares | array | array() | false | Set middlewares for all API methods
+middleware | array | array() | false | Set middleware for all API methods
 
 Example:
 ```
@@ -119,7 +119,7 @@ Example:
 
 return [
     ...other config...
-    'middlewares' => ['middleware1', 'middleware2', ...]
+    'middleware' => ['middleware1', 'middleware2', ...]
 ];
 ```
 
@@ -240,9 +240,9 @@ return [
 ];
 ```
 
-### Resource middlewares
+### Resource middleware
 
-You can override [Global Middlewares](#global-middlewares) config for a specified resource by setting `middlewares` element inside [Resource Config](#resource-config). For example:
+You can override [Global Middleware](#global-middleware) config for a specified resource by setting `middleware` element inside [Resource Config](#resource-config). For example:
 
 ```
 <?php
@@ -254,7 +254,11 @@ return [
         ...
         App\User::class => [
             ...
-            'middlewares' => ['middleware1', 'middleware2']
+            'middleware' => [
+                'get' => ['middleware1', 'middleware2'],
+                'post' => ['middleware3', 'middleware4'],
+                ...
+            ]
         ]
     ]
 ];

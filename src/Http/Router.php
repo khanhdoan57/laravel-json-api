@@ -76,8 +76,8 @@ class Router {
             
                 foreach ($routes as $method) {
 
-                    // Get middlewares
-                    $middlewares = $this->getRouteMiddlewares($modelClass, $method);
+                    // Get middleware
+                    $middleware = $this->getRouteMiddleware($modelClass, $method);
 
                     // Get relationship
                     if ($method === 'getRelationships') {
@@ -88,7 +88,7 @@ class Router {
                             $controller = app()->make('laravel-json-api')->getController($modelClass);
                             return $controller->relationships($id, $relationshipName);
 
-                        })->name($method)->middleware($middlewares);
+                        })->name($method)->middleware($middleware);
 
                         continue;
                     }
@@ -102,7 +102,7 @@ class Router {
                             $controller = app()->make('laravel-json-api')->getController($modelClass);
                             return $controller->relationships($id, $relationshipName, 'resource');
 
-                        })->name($method)->middleware($middlewares);
+                        })->name($method)->middleware($middleware);
 
                         continue;
                     }
@@ -118,8 +118,9 @@ class Router {
                             $controller = app()->make('laravel-json-api')->getController($modelClass);
                             return $controller->storeRelationships($id, $relationshipName);
 
-                        })->name($method)->middleware($middlewares);
+                        })->name($method)->middleware($middleware);
 
+                        continue;
                     }
 
                     // Define route
@@ -134,7 +135,7 @@ class Router {
                                 return $controller->{$method}($id);
 
                             }
-                    )->name($method)->middleware($middlewares);
+                    )->name($method)->middleware($middleware);
 
                 }
 
@@ -191,15 +192,15 @@ class Router {
             
                 foreach ($routes as $method) {
 
-                    // Get middlewares
-                    $middlewares = $this->getRouteMiddlewares($modelClass, $method);
+                    // Get middleware
+                    $middleware = $this->getRouteMiddleware($modelClass, $method);
 
                     // Get relationship
                     if ($method === 'getRelationships') {
 
                         $router->get('{id}/relationships/{relationshipName}', [
                             'as' => $method,
-                            'middleware' => $middlewares,
+                            'middleware' => $middleware,
                             isset($actions[$method]) ? $actions[$method] : function($id, $relationshipName) use ($modelClass) {
 
                                 // Auto controller
@@ -217,7 +218,7 @@ class Router {
 
                         $router->get('{id}/{relationshipName}', [
                             'as' => $method,
-                            'middleware' => $middlewares,
+                            'middleware' => $middleware,
                             isset($actions[$method]) ? $actions[$method] : function($id, $relationshipName) use ($modelClass) {
 
                                 // Auto controller
@@ -237,7 +238,7 @@ class Router {
 
                         $router->{$method}('{id}/relationships/{relationshipName}', [
                             'as' => $method,
-                            'middleware' => $middlewares,
+                            'middleware' => $middleware,
                             isset($actions[$method]) ? $actions[$method] : function($id, $relationshipName) use ($modelClass) {
 
                                 // Auto controller
@@ -247,6 +248,7 @@ class Router {
                             }
                         ]);
 
+                        continue;
                     }
 
                     // Define route
@@ -254,7 +256,7 @@ class Router {
                         in_array($method, ['get', 'patch', 'delete']) ? '{id}' : '/', 
                         [
                             'as' => $method,
-                            'middleware' => $middlewares,
+                            'middleware' => $middleware,
 
                             // Controller
                             isset($actions[$method]) ? $actions[$method] :
@@ -281,16 +283,24 @@ class Router {
     }
 
     /**
-    * Get route middlewares
+    * Get route middleware
     */
-    private function getRouteMiddlewares($modelClass, $routeName)
+    private function getRouteMiddleware($modelClass, $routeName)
     {
         if (isset($this->config['resources'][$modelClass]['middlewares'][$routeName])) {
             return $this->config['resources'][$modelClass]['middlewares'][$routeName];
         }
 
+        if (isset($this->config['resources'][$modelClass]['middleware'][$routeName])) {
+            return $this->config['resources'][$modelClass]['middleware'][$routeName];
+        }
+
         if (isset($this->config['middlewares'])) {
             return $this->config['middlewares'];
+        }
+
+        if (isset($this->config['middleware'])) {
+            return $this->config['middleware'];
         }
 
         return [];
