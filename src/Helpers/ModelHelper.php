@@ -39,8 +39,9 @@ class ModelHelper {
 
         foreach ($sortByClass as $className => $data) {
     
-            // Done have permission            
-            if (!Authorization::check('viewAny', $className, false)) {
+            // Done have permission (if deep_policy check is off)
+            if ((isset(app()->make('laravel-json-api')->getConfig()['deep_policy_check']) and !app()->make('laravel-json-api')->getConfig()['deep_policy_check'])
+                and !Authorization::check('viewAny', $className, false)) {
                 unset($sortByClass[$className]);
                 continue;
             }
