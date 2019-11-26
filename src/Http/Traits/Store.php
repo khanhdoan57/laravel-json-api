@@ -137,7 +137,7 @@ trait Store {
 
             // Relationships handler
             if (isset($data['data']['relationships'])) {
-                $this->makeRelationships($resourceModel, $data['data']['relationships']);
+                $this->makeRelationships($resourceModel, $data['data']['relationships'], false, false);
             }
 
             return $resourceModel;
@@ -153,10 +153,9 @@ trait Store {
     * @param array data
     * @return void
     */
-    protected function makeRelationships($resourceModel, $relationshipData, $isRelationshipRequest = false)
+    protected function makeRelationships($resourceModel, $relationshipData, $isRelationshipRequest = false, $useTransaction = true)
     {
-        // DB transaction
-        \DB::transaction(function() use ($resourceModel, $relationshipData, $isRelationshipRequest) {
+        $make = function($resourceModel, $relationshipData, $isRelationshipRequest) {
 
             $modelClass = get_class($resourceModel);
 
@@ -349,7 +348,16 @@ trait Store {
 
             }
 
-        });
+        };
+
+        // DB transaction
+        if ($useTransaction) {
+            \DB::transaction(function() use ($make, $resourceModel, $relationshipData, $isRelationshipRequest) {
+                $make($resourceModel, $relationshipData, $isRelationshipRequest);
+            });
+        } else {
+            $make($resourceModel, $relationshipData, $isRelationshipRequest);
+        }
         
     }
 
