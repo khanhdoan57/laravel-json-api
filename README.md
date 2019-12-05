@@ -26,6 +26,7 @@
     - [Sorting results](#sorting-results)
     - [Filter and custom query](#filter-and-custom-query)
     - [Including and excluding fields](#including-and-excluding-fields)
+    - [Including and excluding relationships](#including-and-excluding-relationships)
 - [Testing](#testing)
 
 # Installation
@@ -960,6 +961,16 @@ Example:
 `GET /api/users?includes[users]=name,email&excludes[posts]=content,description`
 
 *Return only "email", "name" attributes for `users` resources and excludes "content", "description" attributes from `posts` resources*
+
+## Including and excluding relationships
+
+You can define which relationships should be included / excluded from resposne document using `include_relationships` and `exclude_relationships` params.
+
+Syntax:
+```
+?include_relationships[resource-type]=relationship1,relationship2
+?exclude_relationships[resource-type]=relationship1,relationship2
+```
 
 # Testing
 

@@ -444,13 +444,48 @@ class Controller extends BaseController {
 
             foreach ($collection as $resource) {
 
-                $resourceRelationships = $this->document->getResource($resource)->getRelationships();
+                $jsonApiResource = $this->document->getResource($resource);
+                $resourceRelationships = $jsonApiResource->getRelationships();
+                $resourceType = $jsonApiResource->getType();
 
                 // Set included resources
                 foreach ($resourceRelationships as $relationshipName => $relationshipResourceData) {
 
-                    if (isset($this->config['resources'][$this->modelClass]['relationships'][$relationshipName]['included']) and !in_array($asMethod, $this->config['resources'][$this->modelClass]['relationships'][$relationshipName]['included'])) {
+                    // If relationship isn't in included list
+                    if (isset($this->config['resources'][$this->modelClass]['relationships'][$relationshipName]['included']) 
+                        and !in_array($asMethod, $this->config['resources'][$this->modelClass]['relationships'][$relationshipName]['included'])
+                    ) {
                         continue;
+                    }
+
+                    // If include_relationships is set
+                    if ($includeRelationships = $this->request->query('include_relationships')
+                        and is_array($includeRelationships)
+                        and array_key_exists($resourceType, $includeRelationships)
+                    ) {
+
+                        $includeRelationshipNames = array_filter(explode(',', $includeRelationships[$resourceType]));
+
+                        // If not in included list
+                        if (!in_array($relationshipName, $includeRelationshipNames)) {
+                            continue;
+                        }
+
+                    }
+
+                    // If exclude_relationships is set
+                    if ($excludeRelationships = $this->request->query('exclude_relationships')
+                        and is_array($excludeRelationships)
+                        and array_key_exists($resourceType, $excludeRelationships)
+                    ) {
+
+                        $excludeRelationshipNames = array_filter(explode(',', $excludeRelationships[$resourceType]));
+
+                        // If in excluded list
+                        if (in_array($relationshipName, $excludeRelationshipNames)) {
+                            continue;
+                        }
+
                     }
 
                     $relationshipResourceData = isset($relationshipResourceData['data']) ? $relationshipResourceData['data'] : $relationshipResourceData;
