@@ -106,6 +106,18 @@ trait CustomQuery {
             return;
         }
 
+        // If not custom handler - accept value as integer or string only
+        if (isset($queryData['value']) and !is_integer($queryData['value']) and !is_string($queryData['value'])) {
+
+            throw new JsonApiException([
+                'errors' => [
+                    'title' => 'Invalid query value for "'.$queryData['field'].'": '.json_encode($queryData['value']).'. Query value must be integer or string.'
+                ],
+                'statusCode' => 400
+            ]);
+
+        }
+
         // Auto query builder
         $whereMethod = null;
 
