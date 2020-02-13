@@ -418,8 +418,8 @@ trait Store {
         }
 
         // If has name map
-        if (isset($morphMap[$morphToModelClass])) {
-            $morphToModelClass = $morphMap[$morphToModelClass];
+        if ($customType = array_search($morphToModelClass, $morphMap)) {
+            $morphToModelClass = $customType;
         }
 
         // Set morph type and id
@@ -475,8 +475,8 @@ trait Store {
 
         $morphToType = ($relationshipObject instanceof Relations\MorphToMany) ? $relationshipObject->getMorphClass() : $parentClass;
 
-        if (isset($morphMap[$morphToType])) {
-            $morphToType = $morphMap[$morphToType];
+        if ($customType = array_search($morphToType, $morphMap)) {
+            $morphToType = $customType;
         }
 
         // Get relationship table name
@@ -646,8 +646,8 @@ trait Store {
         $morphMap = $relationshipObject->morphMap();
         $morphToType = get_class($modelObject);
 
-        if (isset($morphMap[$morphToType])) {
-            $morphToType = $morphMap[$morphToType];
+        if ($customType = array_search($morphToType, $morphMap)) {
+            $morphToType = $customType;
         }
 
         $morphOne = function($relationship) use ($modelObject, $relationshipObject, $relatedClass, $relatedType, $relationshipName, $relationshipData, $morphToType) {
