@@ -827,9 +827,9 @@ After set [Resource Filter](#filter) config. You can now filter the results with
 
 `GET https://localhost/api/users?filter[email]=example@gmail.com&filter[name]=Example`
 
-Alternatively, for complex queries, you can make a custom query using `_query` param.
+Alternatively, for complex queries, you can make a custom query using `_query` param, or set a header `query`
 
-`_query` param must be a JSON string. Can be a [query object](#query-objects), [query group object](#query-group-objects) or an array of multiple query / query group objects. For example:
+`_query` param or `query` header must be a JSON string. Can be a [query object](#query-objects), [query group object](#query-group-objects) or an array of multiple query / query group objects. For example:
 
 `GET https://localhost/api/users?_query=[{"field":"email","value":"example@gmail.com"},{"field":"name","value":"test","boolean":"or"}]`
 
