@@ -164,7 +164,7 @@ class Router {
             // Route group
             $router->group([
                 'prefix' => (isset($this->config['prefix']) ? $this->config['prefix'] : '/').'/'.$resourceType,
-                'as' => $resourceType.'.'
+                'as' => $resourceType
             ], function() use ($modelClass, $router) {
 
                 $defaultRouteData = ['get', 'collection', 'post', 'patch', 'delete', 'getRelationships', 'postRelationships', 'patchRelationships', 'deleteRelationships', 'getRelationshipData'];
