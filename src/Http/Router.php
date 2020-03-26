@@ -198,77 +198,127 @@ class Router {
                     // Get relationship
                     if ($method === 'getRelationships') {
 
-                        $router->get('{id}/relationships/{relationshipName}', [
+                        // Route data
+                        $routeData = [
                             'as' => $method,
                             'middleware' => $middleware,
-                            isset($actions[$method]) ? $actions[$method] : function($id, $relationshipName) use ($modelClass) {
+                        ];
+
+                        // Check callback
+                        if (isset($actions[$method]) and is_string($actions[$method])) {
+                            $routeData['uses'] = $actions[$method];
+                        } else {
+
+                            // Handler
+                            $routeData[] = function($id, $relationshipName) use ($actions, $method, $modelClass) {
+
+                                if (isset($actions[$method]) and is_callable($actions[$method])) {
+                                    return call_user_func_array($actions[$method], [$id, $relationshipName]);
+                                }
 
                                 // Auto controller
                                 $controller = app()->make('laravel-json-api')->getController($modelClass);
                                 return $controller->relationships($id, $relationshipName);
 
-                            }
-                        ]);
+                            };
+                        }
 
+                        $router->get('{id}/relationships/{relationshipName}', $routeData);
                         continue;
                     }
 
                     // Get relationship data
                     if ($method === 'getRelationshipData') {
 
-                        $router->get('{id}/{relationshipName}', [
+                        // Route data
+                        $routeData = [
                             'as' => $method,
                             'middleware' => $middleware,
-                            isset($actions[$method]) ? $actions[$method] : function($id, $relationshipName) use ($modelClass) {
+                        ];
+
+                        // Check callback
+                        if (isset($actions[$method]) and is_string($actions[$method])) {
+                            $routeData['uses'] = $actions[$method];
+                        } else {
+
+                            // Handler
+                            $routeData[] = function($id, $relationshipName) use ($actions, $method, $modelClass) {
+
+                                if (isset($actions[$method]) and is_callable($actions[$method])) {
+                                    return call_user_func_array($actions[$method], [$id, $relationshipName]);
+                                }
 
                                 // Auto controller
                                 $controller = app()->make('laravel-json-api')->getController($modelClass);
                                 return $controller->relationships($id, $relationshipName, 'resource');
 
-                            }
-                        ]);
+                            };
+                        }
 
+                        $router->get('{id}/{relationshipName}', $routeData);
                         continue;
                     }
 
                     // Write/delete relationships
                     if (in_array($method, ['postRelationships', 'patchRelationships', 'deleteRelationships'])) {
 
-                        $method = str_replace('Relationships', '', $method);
-
-                        $router->{$method}('{id}/relationships/{relationshipName}', [
+                        // Route data
+                        $routeData = [
                             'as' => $method,
                             'middleware' => $middleware,
-                            isset($actions[$method]) ? $actions[$method] : function($id, $relationshipName) use ($modelClass) {
+                        ];
+
+                        // Check callback
+                        if (isset($actions[$method]) and is_string($actions[$method])) {
+                            $routeData['uses'] = $actions[$method];
+                        } else {
+
+                            // Handler
+                            $routeData[] = function($id, $relationshipName) use ($actions, $method, $modelClass) {
+
+                                if (isset($actions[$method]) and is_callable($actions[$method])) {
+                                    return call_user_func_array($actions[$method], [$id, $relationshipName]);
+                                }
 
                                 // Auto controller
                                 $controller = app()->make('laravel-json-api')->getController($modelClass);
                                 return $controller->storeRelationships($id, $relationshipName);
 
-                            }
-                        ]);
+                            };
+                        }
 
+                        $router->{str_replace('Relationships', '', $method)}('{id}/relationships/{relationshipName}', $routeData);
                         continue;
                     }
 
                     // Define route
+                    $routeData = [
+                        'as' => $method,
+                        'middleware' => $middleware,
+                    ];
+
+                    // Check callback
+                    if (isset($actions[$method]) and is_string($actions[$method])) {
+                        $routeData['uses'] = $actions[$method];
+                    } else {
+
+                        // Handler
+                        $routeData[] = function($id = null) use ($actions, $method, $modelClass) {
+
+                            if (isset($actions[$method]) and is_callable($actions[$method])) {
+                                return call_user_func_array($actions[$method], [$id]);
+                            }
+
+                            // Auto controller
+                            $controller = app()->make('laravel-json-api')->getController($modelClass);
+                            return $controller->{$method}($id);
+
+                        };
+                    }
+
                     $router->{$method === 'collection' ? 'get' : $method}(
                         in_array($method, ['get', 'patch', 'delete']) ? '{id}' : '/', 
-                        [
-                            'as' => $method,
-                            'middleware' => $middleware,
-
-                            // Controller
-                            isset($actions[$method]) ? $actions[$method] :
-                                function($id = null) use ($method, $modelClass) {
-
-                                    // Auto controller
-                                    $controller = app()->make('laravel-json-api')->getController($modelClass);
-
-                                    return $controller->{$method}($id);
-
-                                }
-                        ]
+                        $routeData
                     );
 
                 }
