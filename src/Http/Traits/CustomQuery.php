@@ -14,7 +14,7 @@ trait CustomQuery {
     * @return void
     */
     private $conditionCount = 0;
-    private function queryComposer($data, $query)
+    public function queryComposer($data, $query)
     {
         if (!$data or !is_array($data)) {
             return;
@@ -74,7 +74,7 @@ trait CustomQuery {
     * @param object Query object
     * @return object Query object
     */
-    private function queryMaker($queryData, $query)
+    public function queryMaker($queryData, $query)
     {
         $queryData = $this->queryDataValidator($queryData);
 
@@ -154,7 +154,14 @@ trait CustomQuery {
 
     }
 
-    private function queryDataValidator($queryData, $return = false)
+    /**
+    * Query data validator
+    *
+    * @param array Queyr data
+    * @param bool Returning
+    * @return array|null
+    */
+    public function queryDataValidator($queryData, $return = false)
     {
         if (!is_array($queryData)) {
 
