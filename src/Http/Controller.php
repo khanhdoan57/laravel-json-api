@@ -601,6 +601,15 @@ class Controller extends BaseController {
 
             $resourceModel = $query->first();
 
+            if (!$resourceModel) {
+                throw new JsonApiException([
+                    'errors' => [
+                        'title' => 'Resource not found'
+                    ],
+                    'statusCode' => 404
+                ]);
+            }
+
             // Check auth
             Authorization::check('delete', $resourceModel);
 
