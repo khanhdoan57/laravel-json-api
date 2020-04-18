@@ -2,7 +2,40 @@
 
 namespace HackerBoy\LaravelJsonApi\Http\Traits;
 
+use HackerBoy\LaravelJsonApi\Exceptions\JsonApiException;
+
 trait Pagination {
+
+    /**
+     * Pagination handler
+     * Use callback if present or use the default resolver
+     */
+    protected function handlePagination()
+    {
+        // Pagination callback
+        if (isset($this->config['events']['collection.pagination']) and is_callable($this->config['events']['collection.pagination'])) {
+
+            // Get pagination data from callback
+            $pagination = call_user_func_array($this->config['events']['collection.pagination'], [$this->modelClass, $this]);
+
+            if (!is_array($pagination)
+                or !isset($pagination[0]) or !is_int($pagination[0])
+                or !isset($pagination[1]) or !is_int($pagination[1])
+                or !isset($pagination[2]) or !is_int($pagination[2])
+            ) {
+                throw new JsonApiException([
+                    'errors' => [
+                        'title' => 'Invalid pagination data. Pagination callback must return an array with 3 members: page (integer), limit (integer), skip (integer)'
+                    ]
+                ]);
+            }
+
+            // Override pagination
+            return $pagination;
+        }
+
+        return $this->requestPagination();
+    }
 
     /**
      * Default pagination handler
@@ -35,7 +68,7 @@ trait Pagination {
      */
     protected function responsePagination($query)
     {
-        list($page, $limit, $offset) = $this->requestPagination();
+        list($page, $limit, $offset) = $this->handlePagination();
 
         // Count
         $count = $query->count();
