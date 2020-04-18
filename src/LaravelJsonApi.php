@@ -37,6 +37,7 @@ class LaravelJsonApi {
     *
     *        'relationships.beforeReturn' => function($modelObject, $relationshipName, $document) {},
     *
+    *        'collection.pagination' => function(Request $request) {}, // Return [page, limit, skip]
     *        'collection.query' => function($modelClass, $query) {},
     *        'collection.afterQuery' => function($collection) {},
     *        'collection.beforeReturn' => function($collection, $document) {},

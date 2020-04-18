@@ -4,7 +4,13 @@ namespace HackerBoy\LaravelJsonApi\Http\Traits;
 
 trait Pagination {
 
-    protected function requestPagination()
+    /**
+     * Default pagination handler
+     * Generate pagination data from request
+     *
+     * @return array
+     */
+    public function requestPagination()
     {
         $request = $this->request;
 
@@ -22,6 +28,11 @@ trait Pagination {
         return [$page, $limit, ($page-1)*$limit];
     }
 
+    /**
+     * Handle response pagination
+     *
+     * @param $query
+     */
     protected function responsePagination($query)
     {
         list($page, $limit, $offset) = $this->requestPagination();

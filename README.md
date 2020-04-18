@@ -658,6 +658,15 @@ $controller | object | Current controller
 
 These events will be triggered in GET request for resource collection.
 
+### collection.pagination
+
+This event enable you to override default pagination resolver.
+
+Param | Type | Description
+------|------|------------
+$modelClass | string | Model class name
+$controller | object | Current controller. You can get the Request instance by calling $controller->getRequest() or return default value by calling $controller->requestPagination()
+
 ### collection.query
 
 This event will be triggered before the get query is executed.

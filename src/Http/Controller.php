@@ -34,6 +34,16 @@ class Controller extends BaseController {
     }
 
     /**
+     * Get request instance
+     *
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    /**
     * Get a single resource
     * 
     * @param mixed Resource ID
@@ -407,6 +417,28 @@ class Controller extends BaseController {
                 // Callback
                 if (isset($this->config['events']['collection.query']) and is_callable($this->config['events']['collection.query'])) {
                     call_user_func_array($this->config['events']['collection.query'], [$this->modelClass, $query, $this]);
+                }
+
+                // Pagination callback
+                if (isset($this->config['events']['collection.pagination']) and is_callable($this->config['events']['collection.pagination'])) {
+
+                    // Get pagination data from callback
+                    $pagination = call_user_func_array($this->config['events']['collection.pagination'], [$this->modelClass, $this]);
+
+                    if (!is_array($pagination)
+                        or !isset($pagination[0]) or !is_int($pagination[0])
+                        or !isset($pagination[1]) or !is_int($pagination[1])
+                        or !isset($pagination[2]) or !is_int($pagination[2])
+                    ) {
+                        throw new JsonApiException([
+                            'errors' => [
+                                'title' => 'Invalid pagination data. Pagination callback must return an array with 3 members: page (integer), limit (integer), skip (integer)'
+                            ]
+                        ]);
+                    }
+
+                    // Override pagination
+                    list($page, $limit, $skip) = $pagination;
                 }
 
                 $collection = $this->sortQuery(clone $query)->take($limit)->skip($skip)->get();
