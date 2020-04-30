@@ -161,7 +161,7 @@ trait Store {
 
             foreach ($relationshipData as $relationshipName => $relationshipData) {
 
-                if (array_key_exists('write', ($this->config['resources'][$modelClass]['relationships'][$relationshipName]))) {
+                if (array_key_exists('relationships', $this->config['resources'][$modelClass]) and array_key_exists('write', $this->config['resources'][$modelClass]['relationships'][$relationshipName])) {
 
                     // If write option is off
                     if (!$this->config['resources'][$modelClass]['relationships'][$relationshipName]['write']) {
@@ -177,7 +177,8 @@ trait Store {
                 }
                 
                 // Auto handler
-                if (isset($this->config['resources'][$modelClass]['relationships'][$relationshipName]['relation'])
+                if (array_key_exists('relationships', $this->config['resources'][$modelClass])
+                    and isset($this->config['resources'][$modelClass]['relationships'][$relationshipName]['relation'])
                     and $relation = $this->config['resources'][$modelClass]['relationships'][$relationshipName]['relation']
                     and method_exists($modelClass, $relation)
                     and (($relationshipObject = $resourceModel->{$relation}()) instanceof Relation)
