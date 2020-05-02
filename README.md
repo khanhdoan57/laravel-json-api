@@ -479,7 +479,7 @@ return [
                 'comments' => [
                     'relation' => 'comments',
                     'included' => ['get', 'collection', 'getRelationships', ...], // Optional config, define which routes will include "comments" resources
-                    'write' => function($request, $modelObject, $relationshipData) {}, // You can also define a custom handler for relationship write requests.
+                    'write' => function($modelObject, $relationshipData, $controller) {}, // You can also define a custom handler for relationship write requests.
                     'use_observers' => true, // Using observers while saving relationship objects. Default: true (If you are using auto write handler)
                 ]
             ]
