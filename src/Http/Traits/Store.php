@@ -161,6 +161,11 @@ trait Store {
 
             foreach ($relationshipData as $relationshipName => $relationshipData) {
 
+                // Skip if relationship config isn't set
+                if (!isset($this->config['resources'][$modelClass]['relationships'][$relationshipName])) {
+                    continue;
+                }
+
                 if (array_key_exists('relationships', $this->config['resources'][$modelClass]) and array_key_exists('write', $this->config['resources'][$modelClass]['relationships'][$relationshipName])) {
 
                     // If write option is off
