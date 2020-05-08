@@ -405,10 +405,17 @@ class Controller extends BaseController {
                         ];
                     }
 
-                    $this->queryComposer($queryData, $query);
+                    // Wrap the query composer
+                    $query->where(function($query) use ($queryData) {
+                        $this->queryComposer($queryData, $query);
+                    });
 
                 } elseif (($queryData = $this->request->query('_query') or $queryData = $this->request->header('query')) and $queryData = json_decode(urldecode($queryData), true) and is_array($queryData)) {
-                    $this->queryComposer($queryData, $query);
+
+                    // Wrap the query composer
+                    $query->where(function($query) use ($queryData) {
+                        $this->queryComposer($queryData, $query);
+                    });
                 }
 
                 // Callback
