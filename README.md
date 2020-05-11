@@ -611,6 +611,21 @@ class Post extends Model
 
 ```
 
+### Store relationships first
+
+By default, in all write requests (post/patch), the library will save the model object first, then trigger relationship handler callbacks to save relationships. But in case you need to run relationship handlers first. Just add `"store_relationships_first" => true` to your resource config like below:
+
+```php
+<?php
+
+// ./config/laravel_jsonapi.php
+return [
+    YourModel::class => [
+        'store_relationships_first' => true, // Default value is false
+    ]
+];
+```
+
 # Events
 
 Events are registered under "events" member in your config

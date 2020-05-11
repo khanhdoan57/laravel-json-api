@@ -128,6 +128,13 @@ trait Store {
                 call_user_func_array($this->config['events'][$asMethod.'.saving'], [$resourceModel, $this]);
             }
 
+            // Relationship handler first
+            $storeRelationshipsFirst = isset($this->config['resources'][$this->modelClass]['store_relationships_first']) and $this->config['resources'][$this->modelClass]['store_relationships_first'];
+            if ($storeRelationshipsFirst and isset($data['data']['relationships'])
+            ) {
+                $this->makeRelationships($resourceModel, $data['data']['relationships'], false, false);
+            }
+
             $resourceModel->save();
 
             // Callback
@@ -136,7 +143,7 @@ trait Store {
             }
 
             // Relationships handler
-            if (isset($data['data']['relationships'])) {
+            if (!$storeRelationshipsFirst and isset($data['data']['relationships'])) {
                 $this->makeRelationships($resourceModel, $data['data']['relationships'], false, false);
             }
 
