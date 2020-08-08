@@ -18,7 +18,7 @@ trait Pagination {
         if (isset($this->config['events']['collection.pagination']) and is_callable($this->config['events']['collection.pagination'])) {
 
             // Execute callback
-            call_user_func_array($this->config['events']['collection.pagination'], [$this->modelClass, $this, $query]);
+            call_user_func_array($this->config['events']['collection.pagination'], [$this->modelClass, $query, $this]);
             return;
         }
 

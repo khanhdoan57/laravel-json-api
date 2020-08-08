@@ -680,6 +680,7 @@ This event enable you to override default pagination resolver.
 Param | Type | Description
 ------|------|------------
 $modelClass | string | Model class name
+$query | object | Laravel query object
 $controller | object | Current controller. You can get the Request instance by calling $controller->getRequest() or return default value by calling $controller->requestPagination()
 
 ### collection.query
