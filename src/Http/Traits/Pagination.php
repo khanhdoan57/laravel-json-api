@@ -9,32 +9,22 @@ trait Pagination {
     /**
      * Pagination handler
      * Use callback if present or use the default resolver
+     *
+     * @param $query
      */
-    protected function handlePagination()
+    protected function handlePagination($query)
     {
         // Pagination callback
         if (isset($this->config['events']['collection.pagination']) and is_callable($this->config['events']['collection.pagination'])) {
 
-            // Get pagination data from callback
-            $pagination = call_user_func_array($this->config['events']['collection.pagination'], [$this->modelClass, $this]);
-
-            if (!is_array($pagination)
-                or !isset($pagination[0]) or !is_int($pagination[0])
-                or !isset($pagination[1]) or !is_int($pagination[1])
-                or !isset($pagination[2]) or !is_int($pagination[2])
-            ) {
-                throw new JsonApiException([
-                    'errors' => [
-                        'title' => 'Invalid pagination data. Pagination callback must return an array with 3 members: page (integer), limit (integer), skip (integer)'
-                    ]
-                ]);
-            }
-
-            // Override pagination
-            return $pagination;
+            // Execute callback
+            call_user_func_array($this->config['events']['collection.pagination'], [$this->modelClass, $this, $query]);
+            return;
         }
 
-        return $this->requestPagination();
+        list($page, $limit, $skip) = $this->requestPagination();
+        $query->take($limit)->skip($skip);
+        return;
     }
 
     /**
@@ -68,7 +58,7 @@ trait Pagination {
      */
     protected function responsePagination($query)
     {
-        list($page, $limit, $offset) = $this->handlePagination();
+        list($page, $limit, $offset) = $this->requestPagination();
 
         // Count
         $count = $query->count();

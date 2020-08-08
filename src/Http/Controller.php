@@ -418,15 +418,18 @@ class Controller extends BaseController {
                     });
                 }
 
+                // Sorting
+                $sortQuery = $this->sortQuery(clone $query);
+
                 // Callback
                 if (isset($this->config['events']['collection.query']) and is_callable($this->config['events']['collection.query'])) {
                     call_user_func_array($this->config['events']['collection.query'], [$this->modelClass, $query, $this]);
                 }
 
                 // Pagination
-                list($page, $limit, $skip) = $this->handlePagination();
+                $this->handlePagination($sortQuery);
 
-                $collection = $this->sortQuery(clone $query)->take($limit)->skip($skip)->get();
+                $collection = $sortQuery->get();
 
                 // Data pagination
                 $this->responsePagination($query);
