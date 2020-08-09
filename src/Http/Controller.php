@@ -419,7 +419,7 @@ class Controller extends BaseController {
                 }
 
                 // Sorting
-                $sortQuery = $this->sortQuery(clone $query);
+                $query = $this->sortQuery($query);
 
                 // Callback
                 if (isset($this->config['events']['collection.query']) and is_callable($this->config['events']['collection.query'])) {
@@ -427,9 +427,9 @@ class Controller extends BaseController {
                 }
 
                 // Pagination
-                $this->handlePagination($sortQuery);
+                $this->handlePagination($query);
 
-                $collection = $sortQuery->get();
+                $collection = $query->get();
 
                 // Data pagination
                 $this->responsePagination($query);
