@@ -304,7 +304,6 @@ trait CollectionRelationshipResolver {
 
         // Add query
         $relationshipQuery->whereIn($relationshipObject->getQualifiedForeignKeyName(), $collectionIds);
-        $relationshipQuery->groupBy($relationshipObject->getQualifiedForeignKeyName());
 
         $results = $relationshipObject->get();
 
