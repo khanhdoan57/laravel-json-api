@@ -23,7 +23,7 @@ trait Store {
     protected function store($resourceModel, $asMethod = 'post')
     {
         // Protect data by a transaction
-        \DB::transaction(function() use ($resourceModel, $asMethod) {
+        \DB::connection(@$this->config['resources'][$this->modelClass]['connection'])->transaction(function() use ($resourceModel, $asMethod) {
 
             // Get fillable setting
             $fillable = @$this->config['resources'][$this->modelClass]['fillable'];
@@ -365,7 +365,7 @@ trait Store {
 
         // DB transaction
         if ($useTransaction) {
-            \DB::transaction(function() use ($make, $resourceModel, $relationshipData, $isRelationshipRequest) {
+            \DB::connection(@$this->config['resources'][$this->modelClass]['connection'])->transaction(function() use ($make, $resourceModel, $relationshipData, $isRelationshipRequest) {
                 $make($resourceModel, $relationshipData, $isRelationshipRequest);
             });
         } else {
@@ -498,7 +498,7 @@ trait Store {
         // Delete all current relationship first - for replacing
         if ($type === 'replace') {
 
-            $deleteQuery = \DB::table($relationshipTable)
+            $deleteQuery = \DB::connection(@$this->config['resources'][$this->modelClass]['connection'])->table($relationshipTable)
                 ->where($relationshipObject->getQualifiedForeignPivotKeyName(), $modelObject->{$modelObject->getKeyName()});
 
             if ($relationshipObject instanceof Relations\MorphToMany) {
@@ -556,7 +556,7 @@ trait Store {
             if (!$type !== 'replace') { 
 
                 // Find existing
-                $query = \DB::table($relationshipTable);
+                $query = \DB::connection(@$this->config['resources'][$this->modelClass]['connection'])->table($relationshipTable);
 
                 foreach ($_insertData as $key => $value) {
                     $query->where($key, $value);
@@ -600,7 +600,7 @@ trait Store {
             }
 
             // Create relationship
-            \DB::table($relationshipTable)->insert($insertData);
+            \DB::connection(@$this->config['resources'][$this->modelClass]['connection'])->table($relationshipTable)->insert($insertData);
 
             // Callback
             if (isset($this->config['events']['relationships.saved']) and is_callable($this->config['events']['relationships.saved'])) {
